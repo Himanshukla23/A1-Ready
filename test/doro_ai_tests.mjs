@@ -45,7 +45,7 @@ const reqDuring = {
   method: 'POST',
   body: {
     stage: 'during_assessment',
-    message: 'Was ist die richtige Antwort auf Frage 1?',
+    message: 'What is the correct answer to question 1?',
     currentQuestionTopic: 'Food & Drinks',
   },
 };
@@ -59,8 +59,8 @@ assert.ok(resDuring.body.recommendations.length > 0);
 assert.ok(resDuring.body.encouragement);
 // Check that it refused to reveal active answer
 assert.ok(
-  resDuring.body.explanation.includes('keine direkten Lösungen') ||
-    resDuring.body.explanation.includes('Akkusativ'),
+  resDuring.body.explanation.toLowerCase().includes('cannot reveal') ||
+    resDuring.body.explanation.toLowerCase().includes('accusative'),
   'Must maintain exam integrity during active test'
 );
 console.log('✅ Test "Doro during assessment: Anti-leakage guardrails" passed.');
@@ -70,7 +70,7 @@ const reqAfter = {
   method: 'POST',
   body: {
     stage: 'after_assessment',
-    message: 'Erkläre mir meine Fehler und Übungen.',
+    message: 'Explain my mistakes and drills.',
     assessmentSummary: {
       score: 7,
       percentage: 58,
@@ -83,7 +83,7 @@ const resAfter = new MockResponse();
 await handler(reqAfter, resAfter);
 
 assert.equal(resAfter.statusCode, 200);
-assert.ok(resAfter.body.explanation.includes('7 von 12'));
+assert.ok(resAfter.body.explanation.includes('7 of 12'));
 assert.ok(resAfter.body.recommendations.length > 0);
 console.log('✅ Test "Doro after assessment: Detailed feedback & recommendations" passed.');
 

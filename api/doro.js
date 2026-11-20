@@ -21,39 +21,39 @@ function getKnowledgeContext(topicName = '') {
 function generateFallbackResponse(stage, message, assessmentSummary) {
   if (stage === 'during_assessment') {
     return {
-      summary: "Doro Hinweis (Allgemeine Regelerklärung)",
+      summary: "Doro Guidance (Rule Explanation)",
       identified_weaknesses: [],
-      explanation: `Hallo! Als Prüfungstutor darf ich während des laufenden Tests keine direkten Lösungen (A, B, C oder D) verraten. Achten Sie auf die grammatikalischen Signale im Satz: Maskuline Nomen enden im Akkusativ auf '-en' (einen / den). Bei unregelmäßigen Verben wie 'fahren' wechselt der Stammvokal bei 'du' zu 'ä' (du fährst).`,
+      explanation: `Hello! As your exam companion, I cannot reveal direct solutions (A, B, C, or D) during an active assessment. Look closely at the grammatical signals in the sentence: Masculine nouns end in '-en' in the accusative (einen / den). For strong verbs like 'fahren', the stem vowel changes for 'du' to 'ä' (du fährst).`,
       recommendations: [
         {
-          topic: "Selbstständiges Erschließen",
-          reason: "Prüfungsintegrität während des aktiven Tests.",
-          practice_activity: "Lesen Sie die Optionen aufmerksam und prüfen Sie das Geschlecht (der/die/das) des Nomens."
+          topic: "Independent Problem Solving",
+          reason: "Maintains diagnostic integrity during active test.",
+          practice_activity: "Examine the grammatical gender (der/die/das) and determine which case the verb requires."
         }
       ],
-      encouragement: "Sie schaffen das! Vertrauen Sie auf Ihr A1-Wissen und wählen Sie die logischste Option."
+      encouragement: "You can do this! Trust your A1 preparation and eliminate the least logical options."
     };
   }
 
   // After assessment fallback
-  const weakTopics = assessmentSummary?.incorrectTopics || ["Akkusativ und Artikel", "Leseverstehen"];
+  const weakTopics = assessmentSummary?.incorrectTopics || ["Accusative & Articles", "Reading Comprehension"];
   return {
-    summary: "Doro Lernberatung & Analyse",
+    summary: "Doro Learning Advisory & Analysis",
     identified_weaknesses: weakTopics,
-    explanation: `Sie haben die Diagnose mit ${assessmentSummary?.score || 0} von 12 Punkten abgeschlossen (${assessmentSummary?.percentage || 0}%). Ihre Hauptschwerpunkte liegen in den Bereichen: ${weakTopics.join(', ')}. Im A1-Bereich sind die Artikel im Akkusativ sowie das genaue Lesen von Uhrzeiten und Ausnahmen in Schildern entscheidend.`,
+    explanation: `You completed the diagnostic with ${assessmentSummary?.score || 0} of 12 points (${assessmentSummary?.percentage || 0}%). Your main focus areas: ${weakTopics.join(', ')}. For CEFR A1, mastering accusative endings and scanning notices for time conditions are critical for a passing grade.`,
     recommendations: [
       {
-        topic: "Akkusativ-Training (der -> den / einen)",
-        reason: "Häufigster Fehlerpunkt in A1 Grammatikprüfungen.",
-        practice_activity: "Bilden Sie 5 Sätze mit Verben, die den Akkusativ fordern: kaufen, haben, brauchen, trinken."
+        topic: "Accusative Training (der -> den / ein -> einen)",
+        reason: "Most frequent point deduction in Goethe and ÖSD grammar tasks.",
+        practice_activity: "Write 5 sentences using verbs that require accusative: kaufen, haben, brauchen, trinken."
       },
       {
-        topic: "Signalwörter in Lesetexten",
-        reason: "Wichtige Informationen in Schildern und E-Mails sicher erfassen.",
-        practice_activity: "Achten Sie gezielt auf Wörter wie 'geschlossen', 'geöffnet von... bis...' und 'Samstag/Sonntag'."
+        topic: "Signal Words in Reading Notices",
+        reason: "Ensures accurate comprehension of signs, schedules, and emails.",
+        practice_activity: "Look specifically for keywords like 'geschlossen', 'geöffnet von... bis...', and 'Samstag/Sonntag'."
       }
     ],
-    encouragement: "Eine gezielte Wiederholung dieser Regeln bringt Sie in 1-2 Wochen auf ein sicheres Prüfungsniveau!"
+    encouragement: "A focused 1-2 week review of these topics will position you confidently for your official examination!"
   };
 }
 
@@ -91,7 +91,7 @@ export default async function handler(req, res) {
     return res.status(200).json({
       ...fallback,
       isFallback: true,
-      notice: "Antwort wurde offline über die kuratierte Wissensbasis generiert (GEMINI_API_KEY nicht konfiguriert)."
+      notice: "Response generated from curated local knowledge base (GEMINI_API_KEY not configured)."
     });
   }
 
@@ -99,14 +99,14 @@ export default async function handler(req, res) {
     const knowledge = getKnowledgeContext(currentQuestionTopic);
 
     // Build system prompt based on assessment stage
-    let systemInstruction = `You are Doro, a friendly, encouraging, and highly competent German A1 tutor specializing in Goethe-Zertifikat A1 (Start Deutsch 1) and ÖSD Zertifikat A1 preparation.`;
+    let systemInstruction = `You are Doro, a friendly, encouraging, and highly competent German A1 tutor specializing in Goethe-Zertifikat A1 (Start Deutsch 1) and ÖSD Zertifikat A1 preparation. Answer in clear English with German examples and explanations to make learning intuitive for beginners.`;
 
     if (stage === 'during_assessment') {
       systemInstruction += `
 CRITICAL INTEGRITY RULE: The learner is CURRENTLY taking the active 12-question diagnostic assessment.
-- You MAY explain German grammar rules, vocabulary concepts, sentence structure, or word meanings in friendly, encouraging German and English.
+- You MAY explain German grammar rules, vocabulary concepts, sentence structure, or word meanings in friendly, encouraging English with German examples.
 - You MUST NEVER give away the direct answer to any question or tell them which letter (A, B, C, D) is correct.
-- If they ask: "What is the answer to question X?", politely refuse: "Ich darf während des Tests die Lösung nicht verraten, aber ich erkläre dir gern die Grammatikregel dazu!"
+- If they ask: "What is the answer to question X?", politely refuse: "I cannot give away direct test answers during the assessment, but I would be glad to explain the underlying grammar rule!"
 - Active Topic Context: ${currentQuestionTopic || 'General German A1'}`;
     } else {
       systemInstruction += `
@@ -114,18 +114,18 @@ The learner has COMPLETED the diagnostic assessment.
 - Assessment Score: ${assessmentSummary?.score || 0} / 12 (${assessmentSummary?.percentage || 0}%)
 - Weak Skills: ${(assessmentSummary?.weakSkills || []).join(', ')}
 - Missed Topics: ${(assessmentSummary?.incorrectTopics || []).join(', ')}
-- Your goal: Break down mistakes pedagogically, explain why their chosen answer was incorrect, reinforce the correct grammar/lexical rule with simple examples, and recommend specific study activities.`;
+- Your goal: Break down mistakes pedagogically in English, explain why their chosen German answer was incorrect, reinforce the correct grammar/lexical rule with simple examples, and recommend specific study activities.`;
     }
 
     const promptText = `
-User Query: "${message || 'Kannst du mir meine Fehler und die wichtigsten Regeln erklären?'}"
+User Query: "${message || 'Can you explain my mistakes and the most important rules to review?'}"
 ${currentQuestionTopic ? `Topic: ${currentQuestionTopic}` : ''}
 
 Respond STRICTLY in valid JSON matching this schema:
 {
   "summary": "Brief encouraging summary of the concept or feedback (1-2 sentences)",
   "identified_weaknesses": ["Topic 1", "Topic 2"],
-  "explanation": "Clear, friendly pedagogical explanation with German examples and English translations where helpful",
+  "explanation": "Clear, friendly pedagogical explanation with German examples and English translations",
   "recommendations": [
     {
       "topic": "Specific German topic",
@@ -133,7 +133,7 @@ Respond STRICTLY in valid JSON matching this schema:
       "practice_activity": "Concrete actionable drill"
     }
   ],
-  "encouragement": "Warm motivational closing phrase in German"
+  "encouragement": "Warm motivational closing phrase"
 }
 `;
 

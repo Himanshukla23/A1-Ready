@@ -1,9 +1,9 @@
 import React, { useState } from 'react';
 import { useAssessment } from '../context/AssessmentContext';
-import { QUESTIONS } from '../data/questions';
+import { QUESTIONS } from '../data/questions.js';
 import ProgressBar from '../components/ProgressBar';
 import QuestionCard from '../components/QuestionCard';
-import { validateCompletion } from '../services/assessmentService';
+import { validateCompletion } from '../services/assessmentService.js';
 import {
   ChevronLeft,
   ChevronRight,
@@ -68,7 +68,7 @@ export default function AssessmentPage() {
             className="inline-flex items-center gap-1.5 text-xs sm:text-sm font-medium text-slate-500 hover:text-slate-800 transition"
           >
             <ArrowLeft className="w-4 h-4" />
-            <span>Zurück zur Übersicht</span>
+            <span>Back to Overview</span>
           </button>
 
           <button
@@ -76,7 +76,7 @@ export default function AssessmentPage() {
             className="inline-flex items-center gap-1.5 text-xs font-semibold px-3 py-1.5 rounded-lg bg-amber-50 text-amber-800 border border-amber-200 hover:bg-amber-100 transition"
           >
             <Sparkles className="w-3.5 h-3.5 text-amber-600" />
-            <span>Frage an Doro AI stellen</span>
+            <span>Ask Doro AI Tutor</span>
           </button>
         </div>
 
@@ -90,10 +90,10 @@ export default function AssessmentPage() {
               <AlertCircle className="w-5 h-5 text-amber-600 shrink-0 mt-0.5" />
               <div className="flex-1">
                 <h4 className="font-bold text-sm">
-                  Bitte alle 12 Fragen beantworten ({validation.totalCount - validation.answeredCount} offen)
+                  Please answer all 12 questions ({validation.totalCount - validation.answeredCount} unanswered)
                 </h4>
                 <p className="text-xs text-amber-800 mt-1">
-                  Für eine objektive Einstufung müssen alle Fragen beantwortet werden. Klicken Sie auf eine offene Frage, um direkt dorthin zu springen:
+                  For an objective diagnostic report, all questions must be answered. Click any question below to jump directly to it:
                 </p>
                 <div className="flex flex-wrap gap-1.5 mt-2.5">
                   {validation.unansweredIndices.map((idx) => (
@@ -105,7 +105,7 @@ export default function AssessmentPage() {
                       }}
                       className="px-2.5 py-1 text-xs font-bold rounded-md bg-white border border-amber-300 text-amber-900 hover:bg-amber-100"
                     >
-                      Frage {idx + 1}
+                      Question {idx + 1}
                     </button>
                   ))}
                 </div>
@@ -113,7 +113,7 @@ export default function AssessmentPage() {
               <button
                 onClick={() => setShowIncompleteAlert(false)}
                 className="text-amber-700 hover:text-amber-900 p-1"
-                aria-label="Schließen"
+                aria-label="Close"
               >
                 <X className="w-4 h-4" />
               </button>
@@ -136,7 +136,7 @@ export default function AssessmentPage() {
             }`}
           >
             <ChevronLeft className="w-4 h-4" />
-            <span>Zurück</span>
+            <span>Previous</span>
           </button>
 
           <div className="flex items-center gap-3">
@@ -146,7 +146,7 @@ export default function AssessmentPage() {
                 className="hidden sm:inline-flex items-center gap-2 px-4 py-3 rounded-xl font-bold text-sm bg-emerald-600 hover:bg-emerald-700 text-white shadow-sm transition"
               >
                 <Send className="w-4 h-4" />
-                <span>Jetzt Auswerten</span>
+                <span>Evaluate Now</span>
               </button>
             )}
 
@@ -155,7 +155,7 @@ export default function AssessmentPage() {
                 onClick={handleAttemptSubmit}
                 className="inline-flex items-center gap-2 px-6 py-3 rounded-xl font-bold text-sm bg-sky-600 hover:bg-sky-700 text-white shadow-md shadow-sky-600/20 transition"
               >
-                <span>Diagnose Auswerten</span>
+                <span>Evaluate Diagnostic</span>
                 <Send className="w-4 h-4" />
               </button>
             ) : (
@@ -163,7 +163,7 @@ export default function AssessmentPage() {
                 onClick={nextQuestion}
                 className="inline-flex items-center gap-2 px-6 py-3 rounded-xl font-bold text-sm bg-sky-600 hover:bg-sky-700 text-white shadow-md shadow-sky-600/20 transition"
               >
-                <span>Nächste Frage</span>
+                <span>Next Question</span>
                 <ChevronRight className="w-4 h-4" />
               </button>
             )}
@@ -180,11 +180,11 @@ export default function AssessmentPage() {
             </div>
 
             <h3 className="text-xl font-extrabold text-slate-900">
-              Diagnose jetzt auswerten?
+              Evaluate Diagnostic Assessment?
             </h3>
 
             <p className="mt-2 text-sm text-slate-600 leading-relaxed">
-              Sie haben alle <strong>12 Fragen</strong> beantwortet. Das System berechnet nun Ihr Gesamtergebnis, die Skill-Aufschlüsselung (Wortschatz, Grammatik, Lesen) und Ihre Goethe/ÖSD-Prüfungsbereitschaft.
+              You have completed all <strong>12 questions</strong>. The deterministic engine will now calculate your overall readiness, skill breakdown (Vocabulary, Grammar, Reading), and official Goethe/ÖSD booking advice.
             </p>
 
             <div className="mt-6 flex flex-col sm:flex-row items-center gap-3">
@@ -192,13 +192,13 @@ export default function AssessmentPage() {
                 onClick={confirmSubmit}
                 className="w-full sm:w-auto flex-1 py-3 px-5 rounded-xl font-bold text-sm bg-emerald-600 hover:bg-emerald-700 text-white shadow-md transition"
               >
-                Ja, Auswertung anzeigen
+                Yes, View Report
               </button>
               <button
                 onClick={() => setShowSubmitModal(false)}
                 className="w-full sm:w-auto py-3 px-5 rounded-xl font-semibold text-sm bg-slate-100 hover:bg-slate-200 text-slate-700 transition"
               >
-                Nochmals prüfen
+                Review Answers
               </button>
             </div>
           </div>

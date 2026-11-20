@@ -1,5 +1,5 @@
 import React from 'react';
-import { BookOpen, Layers, Compass, CheckCircle2, AlertTriangle } from 'lucide-react';
+import { BookOpen, Layers, Compass } from 'lucide-react';
 
 export default function SkillBreakdown({ skills }) {
   if (!skills) return null;
@@ -7,21 +7,21 @@ export default function SkillBreakdown({ skills }) {
   const skillConfig = [
     {
       key: 'vocabulary',
-      title: 'Wortschatz (Vocabulary)',
+      title: 'Vocabulary (Wortschatz)',
       data: skills.vocabulary,
       icon: BookOpen,
       color: 'sky',
     },
     {
       key: 'grammar',
-      title: 'Grammatik (Grammar)',
+      title: 'Grammar (Grammatik)',
       data: skills.grammar,
       icon: Layers,
       color: 'amber',
     },
     {
       key: 'reading',
-      title: 'Leseverstehen (Reading)',
+      title: 'Reading (Leseverstehen)',
       data: skills.reading,
       icon: Compass,
       color: 'emerald',
@@ -31,20 +31,20 @@ export default function SkillBreakdown({ skills }) {
   const getStatusBadge = (correct, total) => {
     if (correct >= 3) {
       return {
-        label: 'Prüfungsbereit',
+        label: 'Exam-Ready',
         badge: 'bg-emerald-50 text-emerald-700 border-emerald-200',
         barColor: 'bg-emerald-500',
       };
     }
     if (correct === 2) {
       return {
-        label: 'Wiederholen',
+        label: 'Needs Review',
         badge: 'bg-amber-50 text-amber-700 border-amber-200',
         barColor: 'bg-amber-500',
       };
     }
     return {
-      label: 'Basis aufbauen',
+      label: 'Build Foundation',
       badge: 'bg-rose-50 text-rose-700 border-rose-200',
       barColor: 'bg-rose-500',
     };
@@ -90,7 +90,7 @@ export default function SkillBreakdown({ skills }) {
             </div>
 
             <p className="mt-4 text-xs text-slate-500 font-medium">
-              {data.percentage}% richtige Antworten in diesem Modul
+              {data.percentage}% correct answers in this module
             </p>
           </div>
         );

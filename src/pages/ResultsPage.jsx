@@ -6,15 +6,9 @@ import { generateRecommendations } from '../utils/recommendations.js';
 import {
   RotateCcw,
   Sparkles,
-  Award,
   CheckCircle2,
   XCircle,
-  HelpCircle,
-  ArrowRight,
-  ShieldCheck,
   AlertTriangle,
-  Compass,
-  BookOpen,
   ChevronDown,
   ChevronUp,
 } from 'lucide-react';
@@ -26,13 +20,13 @@ export default function ResultsPage() {
   if (!results) {
     return (
       <div className="max-w-2xl mx-auto px-4 py-20 text-center">
-        <h2 className="text-xl font-bold text-slate-800">Keine Testergebnisse gefunden</h2>
-        <p className="mt-2 text-slate-500">Bitte führen Sie zuerst die 12-Fragen-Diagnose durch.</p>
+        <h2 className="text-xl font-bold text-slate-800">No Assessment Results Found</h2>
+        <p className="mt-2 text-slate-500">Please complete the 12-question diagnostic first.</p>
         <button
           onClick={goToLanding}
-          className="mt-6 px-6 py-2.5 bg-sky-600 text-white rounded-xl font-semibold"
+          className="mt-6 px-6 py-2.5 bg-sky-600 text-white rounded-xl font-semibold hover:bg-sky-700"
         >
-          Zur Startseite
+          Return to Overview
         </button>
       </div>
     );
@@ -91,7 +85,7 @@ export default function ResultsPage() {
         {/* Top Header / Action Bar */}
         <div className="flex items-center justify-between">
           <span className="text-xs font-bold uppercase tracking-wider text-slate-500">
-            Diagnosebericht • Goethe- & ÖSD-A1-Bereitschaft
+            Diagnostic Report • Goethe & ÖSD A1 Exam Readiness
           </span>
 
           <div className="flex items-center gap-2">
@@ -100,13 +94,13 @@ export default function ResultsPage() {
               className="inline-flex items-center gap-1.5 text-xs font-semibold px-3 py-1.5 rounded-lg border border-slate-300 bg-white hover:bg-slate-50 text-slate-700 transition"
             >
               <RotateCcw className="w-3.5 h-3.5" />
-              <span>Test wiederholen</span>
+              <span>Retake Diagnostic</span>
             </button>
             <button
               onClick={goToLanding}
               className="text-xs font-medium text-slate-500 hover:text-slate-800 px-2 py-1"
             >
-              Startseite
+              Overview
             </button>
           </div>
         </div>
@@ -129,20 +123,20 @@ export default function ResultsPage() {
               </p>
 
               <div className="mt-4 p-3.5 rounded-xl bg-white/80 border border-black/5 text-xs sm:text-sm text-slate-800">
-                <strong className="text-slate-900">Empfehlung für Ihre Prüfungsanmeldung: </strong>
+                <strong className="text-slate-900">Official Examination Advice: </strong>
                 {readinessCategory.advice}
               </div>
             </div>
 
             {/* Score Ring / Pill */}
             <div className="bg-white rounded-2xl border border-slate-200/80 p-6 flex flex-col items-center justify-center text-center shadow-xs shrink-0 self-start md:self-center min-w-[180px]">
-              <span className="text-xs font-bold text-slate-400 uppercase tracking-wider">Gesamtpunktzahl</span>
+              <span className="text-xs font-bold text-slate-400 uppercase tracking-wider">Total Score</span>
               <div className="text-4xl sm:text-5xl font-black text-slate-900 mt-1">
                 {correctCount}
                 <span className="text-xl text-slate-400 font-bold"> / {totalQuestions}</span>
               </div>
               <div className="mt-2 inline-flex items-center px-3 py-1 rounded-full text-xs font-bold bg-slate-100 text-slate-800">
-                {percentage}% Genauigkeit
+                {percentage}% Accuracy
               </div>
             </div>
           </div>
@@ -152,9 +146,9 @@ export default function ResultsPage() {
         <div>
           <div className="flex items-center justify-between mb-4">
             <h2 className="text-xl font-bold text-slate-900">
-              Leistung nach Kompetenzbereichen
+              Skill-Wise Competency Breakdown
             </h2>
-            <span className="text-xs text-slate-500 font-medium">Je 4 Fragen pro Modul</span>
+            <span className="text-xs text-slate-500 font-medium">4 Questions per Module</span>
           </div>
           <SkillBreakdown skills={skills} />
         </div>
@@ -165,19 +159,19 @@ export default function ResultsPage() {
           <div className="bg-white rounded-2xl border border-slate-200 p-5 shadow-xs">
             <div className="flex items-center gap-2 mb-3 text-emerald-800 font-bold text-sm">
               <CheckCircle2 className="w-4 h-4 text-emerald-600" />
-              <span>Ihre Stärken</span>
+              <span>Your Identified Strengths</span>
             </div>
             {identifiedStrengths.length > 0 ? (
               <ul className="space-y-2">
                 {identifiedStrengths.map((item) => (
                   <li key={item.skill} className="flex items-center justify-between text-xs sm:text-sm p-2 rounded-lg bg-emerald-50/60 border border-emerald-200/60">
                     <span className="font-medium text-slate-800">{item.label}</span>
-                    <span className="font-bold text-emerald-700">{item.score} richtig</span>
+                    <span className="font-bold text-emerald-700">{item.score} correct</span>
                   </li>
                 ))}
               </ul>
             ) : (
-              <p className="text-xs text-slate-500 italic">Noch keine Bereiche mit $\ge 3/4$ Punkten.</p>
+              <p className="text-xs text-slate-500 italic">No modules scored $\ge 3/4$ yet.</p>
             )}
           </div>
 
@@ -185,19 +179,19 @@ export default function ResultsPage() {
           <div className="bg-white rounded-2xl border border-slate-200 p-5 shadow-xs">
             <div className="flex items-center gap-2 mb-3 text-rose-800 font-bold text-sm">
               <AlertTriangle className="w-4 h-4 text-rose-600" />
-              <span>Schwerpunkte für weiteres Üben</span>
+              <span>Focus Areas for Practice</span>
             </div>
             {identifiedWeaknesses.length > 0 ? (
               <ul className="space-y-2">
                 {identifiedWeaknesses.map((item) => (
                   <li key={item.skill} className="flex items-center justify-between text-xs sm:text-sm p-2 rounded-lg bg-rose-50/60 border border-rose-200/60">
                     <span className="font-medium text-slate-800">{item.label}</span>
-                    <span className="font-bold text-rose-700">{item.score} richtig</span>
+                    <span className="font-bold text-rose-700">{item.score} correct</span>
                   </li>
                 ))}
               </ul>
             ) : (
-              <p className="text-xs text-emerald-600 font-medium">Glückwunsch! Alle Bereiche mit $\ge 3/4$ Punkten abgeschlossen.</p>
+              <p className="text-xs text-emerald-600 font-medium">Congratulations! All modules achieved $\ge 3/4$ correct.</p>
             )}
           </div>
         </div>
@@ -207,15 +201,15 @@ export default function ResultsPage() {
           <div className="flex flex-wrap items-center justify-between gap-2 border-b border-slate-100 pb-4 mb-6">
             <div>
               <h2 className="text-xl font-bold text-slate-900">
-                Detaillierte Fehleranalyse ({incorrectQuestions.length} Fragen)
+                Detailed Mistake Analysis ({incorrectQuestions.length} Questions)
               </h2>
               <p className="text-xs sm:text-sm text-slate-500 mt-0.5">
-                Verstehen Sie exakt, warum Ihre gewählte Option falsch war und welche Grammatik- oder Wortschatzregel gilt.
+                Understand exactly why your selected answer was wrong and review the underlying CEFR A1 grammar and vocabulary rules.
               </p>
             </div>
             {incorrectQuestions.length === 0 && (
               <span className="text-xs font-bold text-emerald-700 bg-emerald-50 px-3 py-1 rounded-full border border-emerald-200">
-                100% fehlerfrei!
+                100% Correct!
               </span>
             )}
           </div>
@@ -223,8 +217,8 @@ export default function ResultsPage() {
           {incorrectQuestions.length === 0 ? (
             <div className="text-center py-8 text-slate-500">
               <CheckCircle2 className="w-12 h-12 text-emerald-500 mx-auto mb-2" />
-              <p className="font-bold text-slate-800">Perfektes Ergebnis!</p>
-              <p className="text-xs text-slate-500">Sie haben alle 12 Fragen korrekt beantwortet.</p>
+              <p className="font-bold text-slate-800">Perfect Score!</p>
+              <p className="text-xs text-slate-500">You answered all 12 questions correctly.</p>
             </div>
           ) : (
             <div className="space-y-4">
@@ -246,7 +240,7 @@ export default function ResultsPage() {
                         </span>
                         <div>
                           <div className="flex items-center gap-2">
-                            <span className="text-xs font-bold text-slate-400 uppercase">{q.skillLabel}</span>
+                            <span className="text-xs font-bold text-slate-400 uppercase">{q.skill}</span>
                             <span className="text-slate-300">•</span>
                             <span className="text-xs font-semibold text-slate-700">{q.topic}</span>
                           </div>
@@ -258,7 +252,7 @@ export default function ResultsPage() {
 
                       <div className="flex items-center gap-3">
                         <span className="text-xs font-semibold text-slate-500 hidden sm:inline">
-                          {isExpanded ? 'Einklappen' : 'Erklärung anzeigen'}
+                          {isExpanded ? 'Hide Details' : 'View Explanation'}
                         </span>
                         {isExpanded ? (
                           <ChevronUp className="w-4 h-4 text-slate-400" />
@@ -273,7 +267,7 @@ export default function ResultsPage() {
                         {/* Reading passage if applicable */}
                         {q.passage && (
                           <div className="p-3.5 rounded-xl bg-amber-50/50 border border-amber-200/60 text-xs sm:text-sm text-slate-800 whitespace-pre-line">
-                            <strong className="text-amber-900 block mb-1">Lesetext:</strong>
+                            <strong className="text-amber-900 block mb-1">Passage / Notice:</strong>
                             {q.passage}
                           </div>
                         )}
@@ -286,18 +280,18 @@ export default function ResultsPage() {
                         {/* Answer comparison */}
                         <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs sm:text-sm">
                           <div className="p-3 rounded-xl bg-rose-50 border border-rose-200 text-rose-900">
-                            <span className="text-xs font-bold uppercase tracking-wider block text-rose-700">Ihre Antwort:</span>
+                            <span className="text-xs font-bold uppercase tracking-wider block text-rose-700">Your Selection:</span>
                             <span className="font-semibold">{q.selectedOptionId}: {q.selectedOptionText}</span>
                           </div>
                           <div className="p-3 rounded-xl bg-emerald-50 border border-emerald-200 text-emerald-900">
-                            <span className="text-xs font-bold uppercase tracking-wider block text-emerald-700">Richtige Antwort:</span>
+                            <span className="text-xs font-bold uppercase tracking-wider block text-emerald-700">Correct Answer:</span>
                             <span className="font-semibold">{q.correctOptionId}: {q.correctOptionText}</span>
                           </div>
                         </div>
 
                         {/* Explanation */}
                         <div className="p-4 rounded-xl bg-slate-50 border border-slate-200 text-xs sm:text-sm text-slate-700">
-                          <strong className="text-slate-900 block mb-1">💡 Erklärung & Grammatikregel:</strong>
+                          <strong className="text-slate-900 block mb-1">💡 Explanation & Exam Rule:</strong>
                           <p className="leading-relaxed">{q.explanation}</p>
                         </div>
 
@@ -308,7 +302,7 @@ export default function ResultsPage() {
                             className="inline-flex items-center gap-1.5 text-xs font-semibold px-3 py-1.5 rounded-lg bg-amber-50 text-amber-800 border border-amber-200 hover:bg-amber-100 transition"
                           >
                             <Sparkles className="w-3.5 h-3.5 text-amber-600" />
-                            <span>Doro nach weiteren Beispielen fragen</span>
+                            <span>Ask Doro for more examples</span>
                           </button>
                         </div>
                       </div>
@@ -325,10 +319,10 @@ export default function ResultsPage() {
           <div className="flex items-center justify-between mb-4">
             <div>
               <h2 className="text-xl font-bold text-slate-900">
-                Ihr persönlicher A1-Übungsplan
+                Your Personalized A1 Study Plan
               </h2>
               <p className="text-xs sm:text-sm text-slate-500 mt-0.5">
-                Konkrete Übungsaufgaben basierend auf Ihren Fehlerquellen:
+                Targeted exercises and drills based on your diagnostic results:
               </p>
             </div>
           </div>
@@ -345,13 +339,13 @@ export default function ResultsPage() {
           <div>
             <div className="flex items-center gap-2 text-amber-200 text-xs font-bold uppercase tracking-wider mb-1">
               <Sparkles className="w-4 h-4" />
-              <span>Interaktive Nachbesprechung</span>
+              <span>Interactive Review Session</span>
             </div>
             <h3 className="text-2xl font-black">
-              Möchten Sie diese Fehler mit Doro AI üben?
+              Want to practice these mistakes with Doro AI?
             </h3>
             <p className="mt-1 text-amber-100 text-xs sm:text-sm max-w-xl">
-              Doro kann Ihnen ähnliche Übungsfragen stellen, Akkusativ-Endungen trainieren oder Lesestrategien vertiefen.
+              Doro can generate similar practice questions, drill accusative endings, or explain reading strategies.
             </p>
           </div>
 
@@ -359,7 +353,7 @@ export default function ResultsPage() {
             onClick={toggleDoro}
             className="px-6 py-3.5 rounded-xl bg-white text-amber-900 font-bold text-sm shadow-md hover:bg-amber-50 transition shrink-0"
           >
-            Doro AI öffnen
+            Open Doro AI
           </button>
         </div>
 
@@ -370,14 +364,14 @@ export default function ResultsPage() {
             className="inline-flex items-center gap-2 px-6 py-3.5 rounded-xl font-bold text-sm bg-sky-600 hover:bg-sky-700 text-white shadow-md shadow-sky-600/20 transition"
           >
             <RotateCcw className="w-4 h-4" />
-            <span>Diagnose jetzt wiederholen</span>
+            <span>Retake Diagnostic Assessment</span>
           </button>
 
           <button
             onClick={() => window.print()}
             className="px-6 py-3.5 rounded-xl font-semibold text-sm bg-white hover:bg-slate-100 text-slate-700 border border-slate-300 shadow-xs transition"
           >
-            Ergebnis drucken / als PDF speichern
+            Print / Save PDF Report
           </button>
         </div>
       </div>

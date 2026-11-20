@@ -1,6 +1,6 @@
 import React from 'react';
 import { useAssessment } from '../context/AssessmentContext';
-import { BookOpen, Layers, Compass, Check, AlertCircle } from 'lucide-react';
+import { Compass, Check } from 'lucide-react';
 
 export default function QuestionCard({ question }) {
   const { answers, selectAnswer } = useAssessment();
@@ -14,10 +14,10 @@ export default function QuestionCard({ question }) {
       {/* Category & Topic header */}
       <div className="flex flex-wrap items-center justify-between gap-2 border-b border-slate-100 pb-4 mb-6">
         <div>
-          <span className="text-xs font-bold uppercase tracking-wider text-slate-400">Thema</span>
+          <span className="text-xs font-bold uppercase tracking-wider text-slate-400">Topic</span>
           <h3 className="text-sm sm:text-base font-bold text-slate-800">{question.topic}</h3>
         </div>
-        <span className="text-xs font-medium text-slate-500 bg-slate-100 px-3 py-1 rounded-md">
+        <span className="text-xs font-medium text-slate-600 bg-slate-100 px-3 py-1 rounded-md">
           {question.instruction}
         </span>
       </div>
@@ -27,7 +27,7 @@ export default function QuestionCard({ question }) {
         <div className="mb-6 p-4 sm:p-5 rounded-xl bg-amber-50/60 border border-amber-200/80">
           <div className="flex items-center gap-2 text-xs font-bold text-amber-800 uppercase tracking-wider mb-2">
             <Compass className="w-4 h-4 text-amber-600" />
-            <span>Lesetext / Hinweisschild</span>
+            <span>Reading Passage / Notice (Lesetext)</span>
           </div>
           <div className="whitespace-pre-line text-sm sm:text-base font-medium text-slate-800 leading-relaxed font-sans bg-white/70 p-3.5 rounded-lg border border-amber-200/40">
             {question.passage}

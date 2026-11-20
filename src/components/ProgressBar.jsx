@@ -1,7 +1,7 @@
 import React from 'react';
 import { useAssessment } from '../context/AssessmentContext';
-import { QUESTIONS } from '../data/questions';
-import { BookOpen, Layers, Compass, CheckCircle2 } from 'lucide-react';
+import { QUESTIONS } from '../data/questions.js';
+import { BookOpen, Layers, Compass } from 'lucide-react';
 
 export default function ProgressBar() {
   const { currentQuestionIndex, goToQuestion, answers } = useAssessment();
@@ -9,22 +9,20 @@ export default function ProgressBar() {
 
   const total = QUESTIONS.length;
   const answeredCount = Object.keys(answers).length;
-  const progressPercent = Math.round((answeredCount / total) * 100);
 
-  // Skill configuration styling
   const skillStyles = {
     vocabulary: {
-      label: 'Wortschatz (Vocabulary)',
+      label: 'Vocabulary (Wortschatz)',
       icon: BookOpen,
       badge: 'bg-sky-50 text-sky-700 border-sky-200',
     },
     grammar: {
-      label: 'Grammatik (Grammar)',
+      label: 'Grammar (Grammatik)',
       icon: Layers,
       badge: 'bg-amber-50 text-amber-700 border-amber-200',
     },
     reading: {
-      label: 'Leseverstehen (Reading)',
+      label: 'Reading (Leseverstehen)',
       icon: Compass,
       badge: 'bg-emerald-50 text-emerald-700 border-emerald-200',
     },
@@ -39,9 +37,9 @@ export default function ProgressBar() {
       <div className="flex flex-wrap items-center justify-between gap-3 mb-3">
         <div className="flex items-center gap-2">
           <span className="font-extrabold text-slate-900 text-lg">
-            Frage {currentQuestionIndex + 1}
+            Question {currentQuestionIndex + 1}
           </span>
-          <span className="text-slate-400 font-medium text-sm">von {total}</span>
+          <span className="text-slate-400 font-medium text-sm">of {total}</span>
         </div>
 
         <div className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold border ${currentSkill.badge}`}>
@@ -75,7 +73,7 @@ export default function ProgressBar() {
                   ? 'bg-sky-50 text-sky-800 border border-sky-300 hover:bg-sky-100'
                   : 'bg-slate-100 text-slate-500 hover:bg-slate-200 border border-slate-200'
               }`}
-              title={`Frage ${idx + 1} (${q.topic})${isAnswered ? ' - Beantwortet' : ' - Offen'}`}
+              title={`Question ${idx + 1} (${q.topic})${isAnswered ? ' - Answered' : ' - Unanswered'}`}
             >
               <span>{idx + 1}</span>
             </button>
@@ -87,19 +85,19 @@ export default function ProgressBar() {
         <div className="flex items-center gap-4">
           <span className="inline-flex items-center gap-1">
             <span className="w-2.5 h-2.5 rounded-full bg-sky-600 inline-block"></span>
-            <span>Aktiv</span>
+            <span>Active</span>
           </span>
           <span className="inline-flex items-center gap-1">
             <span className="w-2.5 h-2.5 rounded-full bg-sky-200 border border-sky-400 inline-block"></span>
-            <span>Beantwortet</span>
+            <span>Answered</span>
           </span>
           <span className="inline-flex items-center gap-1">
             <span className="w-2.5 h-2.5 rounded-full bg-slate-200 inline-block"></span>
-            <span>Offen</span>
+            <span>Unanswered</span>
           </span>
         </div>
         <span className="font-semibold text-slate-700">
-          {answeredCount} von {total} beantwortet
+          {answeredCount} of {total} answered
         </span>
       </div>
     </div>

@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useAssessment } from '../context/AssessmentContext';
-import { QUESTIONS } from '../data/questions';
-import { askDoro } from '../services/doroService';
+import { QUESTIONS } from '../data/questions.js';
+import { askDoro } from '../services/doroService.js';
 import {
   Sparkles,
   X,
@@ -10,9 +10,6 @@ import {
   Bot,
   User,
   ShieldAlert,
-  BookOpen,
-  Target,
-  CheckCircle2,
 } from 'lucide-react';
 
 export default function DoroChat() {
@@ -31,21 +28,21 @@ export default function DoroChat() {
         setMessages([
           {
             sender: 'doro',
-            text: `Hallo! Ich bin Doro. Du bearbeitest gerade Frage ${currentQuestionIndex + 1} (${currentQ.topic}). Wenn du eine Grammatikregel oder ein deutsches Wort nicht verstehst, frage mich gerne!\n\n(Hinweis: Direkte Testlösungen verrate ich während des Tests nicht, aber ich erkläre dir die Regeln.)`,
+            text: `Hallo! I am Doro. You are currently on Question ${currentQuestionIndex + 1} (${currentQ.topic}). If you need help understanding a German grammar rule or vocabulary pattern, ask me anytime!\n\n(Note: I can explain concepts and give examples, but exam integrity rules prevent me from revealing direct test answers.)`,
           },
         ]);
       } else if (stage === 'results') {
         setMessages([
           {
             sender: 'doro',
-            text: `Herzlichen Glückwunsch zum Abschluss der 12-Fragen-Diagnose! Du hast ${results?.correctCount || 0} von 12 Punkten erreicht. Ich kann dir jetzt jeden Fehler im Detail erklären oder dir zusätzliche Übungsaufgaben erstellen. Worüber möchtest du sprechen?`,
+            text: `Congratulations on completing the 12-question diagnostic! You scored ${results?.correctCount || 0} of 12 points (${results?.percentage || 0}%). I can now break down each mistake in detail, explain why the rule works, or generate targeted practice drills. What would you like to work on?`,
           },
         ]);
       } else {
         setMessages([
           {
             sender: 'doro',
-            text: 'Hallo! Ich bin Doro, dein persönlicher Lernbegleiter für das Goethe-Zertifikat A1 und das ÖSD Zertifikat A1. Wie kann ich dir heute bei deinem Deutschlernen helfen?',
+            text: 'Hallo! I am Doro, your personal A1 German learning companion for Goethe-Zertifikat A1 and ÖSD Zertifikat A1 preparation. How can I assist your German studies today?',
           },
         ]);
       }
@@ -97,7 +94,7 @@ export default function DoroChat() {
         ...prev,
         {
           sender: 'doro',
-          text: 'Es tut mir leid, es gab ein kurzes Problem bei der Verbindung. Die Grundregeln: Männliche Nomen haben im Akkusativ die Endung -en (den/einen). Wenn du eine konkrete Frage hast, stelle sie bitte noch einmal!',
+          text: 'I apologize, there was a temporary connection hiccup. Core rule reminder: Masculine nouns in the accusative take -en (den/einen). If you have another question, please ask again!',
         },
       ]);
     } finally {
@@ -108,19 +105,19 @@ export default function DoroChat() {
   const quickPrompts =
     stage === 'assessment'
       ? [
-          'Erkläre die Regel für Frage ' + (currentQuestionIndex + 1),
-          'Wie funktioniert der Akkusativ?',
-          'Wann sagt man "zu Hause" vs "nach Hause"?',
+          `Explain the rule for Question ${currentQuestionIndex + 1}`,
+          'How does the Accusative case work?',
+          'When do I use "zu Hause" vs "nach Hause"?',
         ]
       : stage === 'results'
       ? [
-          'Warum war meine Leseverstehens-Antwort falsch?',
-          'Gib mir 3 Übungssätze für den Akkusativ',
-          'Was soll ich in den nächsten 7 Tagen lernen?',
+          'Why was my reading question incorrect?',
+          'Give me 3 practice sentences for accusative',
+          'What should I practice in the next 7 days?',
         ]
       : [
-          'Was wird bei der Goethe A1 Prüfung verlangt?',
-          'Wie funktioniert dieser Test?',
+          'What does the Goethe / ÖSD A1 exam test?',
+          'How does this diagnostic work?',
         ];
 
   return (
@@ -140,9 +137,9 @@ export default function DoroChat() {
             </div>
             <p className="text-xs text-amber-100 font-medium">
               {stage === 'assessment'
-                ? 'Lernhilfe (Integrity Guard aktiv)'
+                ? 'Exam Guard Active (Concepts & Rules)'
                 : stage === 'results'
-                ? 'Ergebnisberatung & Übungen'
+                ? 'Post-Exam Review & Study Drills'
                 : 'German Exam Companion'}
             </p>
           </div>
@@ -151,7 +148,7 @@ export default function DoroChat() {
         <button
           onClick={toggleDoro}
           className="text-white/80 hover:text-white p-1.5 rounded-lg hover:bg-white/10 transition"
-          aria-label="Doro schließen"
+          aria-label="Close Doro"
         >
           <X className="w-5 h-5" />
         </button>
@@ -161,7 +158,7 @@ export default function DoroChat() {
       {stage === 'assessment' && (
         <div className="bg-amber-50 border-b border-amber-200 px-4 py-2 flex items-center gap-2 text-xs text-amber-900 font-medium">
           <ShieldAlert className="w-4 h-4 text-amber-600 shrink-0" />
-          <span>Prüfungsmodus aktiv: Erklärt Regeln, verrät keine direkten Buchstaben.</span>
+          <span>Active Test Guard: Doro explains grammar rules but will not reveal direct answers.</span>
         </div>
       )}
 
@@ -193,7 +190,7 @@ export default function DoroChat() {
               {msg.data?.recommendations && msg.data.recommendations.length > 0 && (
                 <div className="pt-2 border-t border-slate-100 space-y-2 mt-2">
                   <span className="text-[11px] font-bold text-slate-500 uppercase tracking-wider block">
-                    Konkrete Übungsempfehlung:
+                    Targeted Practice Drill:
                   </span>
                   {msg.data.recommendations.map((rec, rIdx) => (
                     <div
@@ -229,7 +226,7 @@ export default function DoroChat() {
             </div>
             <div className="bg-white border border-slate-200 p-3 rounded-2xl rounded-tl-xs shadow-xs flex items-center gap-2 text-xs text-slate-500">
               <Loader2 className="w-4 h-4 animate-spin text-amber-500" />
-              <span>Doro formuliert Erklärung...</span>
+              <span>Doro is preparing an explanation...</span>
             </div>
           </div>
         )}
@@ -264,7 +261,7 @@ export default function DoroChat() {
             type="text"
             value={input}
             onChange={(e) => setInput(e.target.value)}
-            placeholder="Frage zu Grammatik oder Vokabeln..."
+            placeholder="Ask Doro about German grammar or vocabulary..."
             disabled={loading}
             className="flex-1 bg-slate-100 border border-slate-300 rounded-xl px-3.5 py-2.5 text-xs sm:text-sm focus:outline-none focus:ring-2 focus:ring-amber-500 text-slate-800"
           />
@@ -272,7 +269,7 @@ export default function DoroChat() {
             type="submit"
             disabled={loading || !input.trim()}
             className="w-10 h-10 rounded-xl bg-amber-500 hover:bg-amber-600 disabled:bg-slate-200 text-white flex items-center justify-center transition shadow-xs"
-            aria-label="Nachricht senden"
+            aria-label="Send Message"
           >
             <Send className="w-4 h-4" />
           </button>

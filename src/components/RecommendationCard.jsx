@@ -1,5 +1,5 @@
 import React from 'react';
-import { Target, BookOpen, Sparkles, ArrowRight } from 'lucide-react';
+import { Target, Sparkles } from 'lucide-react';
 import { useAssessment } from '../context/AssessmentContext';
 
 export default function RecommendationCard({ recommendation, index }) {
@@ -18,13 +18,13 @@ export default function RecommendationCard({ recommendation, index }) {
         </div>
         {recommendation.priority === 'high' && (
           <span className="text-xs font-bold uppercase tracking-wider px-2.5 py-0.5 rounded-full bg-rose-50 text-rose-700 border border-rose-200 shrink-0">
-            Hohe Priorität
+            High Priority
           </span>
         )}
       </div>
 
       <div className="text-xs sm:text-sm text-slate-600 mb-3 bg-slate-50 p-3 rounded-xl border border-slate-200/70">
-        <strong className="text-slate-800">Grund: </strong>
+        <strong className="text-slate-800">Reason: </strong>
         {recommendation.reason}
       </div>
 
@@ -32,7 +32,7 @@ export default function RecommendationCard({ recommendation, index }) {
         <div className="flex items-start gap-2">
           <Target className="w-4 h-4 text-sky-600 shrink-0 mt-0.5" />
           <div>
-            <strong className="text-slate-900">Konkrete Übung: </strong>
+            <strong className="text-slate-900">Actionable Drill: </strong>
             <span>{recommendation.practice_activity}</span>
           </div>
         </div>
@@ -40,7 +40,7 @@ export default function RecommendationCard({ recommendation, index }) {
 
       <div className="flex flex-wrap items-center justify-between gap-3 pt-3 border-t border-slate-100 text-xs">
         <span className="text-slate-500 font-medium">
-          📖 <strong>Quelle:</strong> {recommendation.resources}
+          📖 <strong>Recommended Resource:</strong> {recommendation.resources}
         </span>
 
         <button
@@ -48,7 +48,7 @@ export default function RecommendationCard({ recommendation, index }) {
           className="inline-flex items-center gap-1.5 text-xs font-semibold text-amber-700 hover:text-amber-800 bg-amber-50 hover:bg-amber-100 px-3 py-1.5 rounded-lg border border-amber-200 transition"
         >
           <Sparkles className="w-3.5 h-3.5 text-amber-500" />
-          <span>Mit Doro AI vertiefen</span>
+          <span>Practice with Doro AI</span>
         </button>
       </div>
     </div>
