@@ -16,7 +16,7 @@ function getKnowledgeContext(topicName = '') {
 }
 
 /**
- * Fallback generator when Gemini API key is missing or unavailable.
+ * Fallback generator when both Gemini and Groq are unavailable or unconfigured.
  */
 function generateFallbackResponse(stage, message, assessmentSummary) {
   if (stage === 'during_assessment') {
@@ -57,6 +57,96 @@ function generateFallbackResponse(stage, message, assessmentSummary) {
   };
 }
 
+/**
+ * Calls Gemini API as primary, with automatic fallback to Groq if Gemini fails or tokens are exhausted.
+ */
+async function callLLMWithGroqFallback({ systemInstruction, promptText, schemaDescription }) {
+  const geminiApiKey = process.env.GEMINI_API_KEY;
+  const groqApiKey = process.env.GROQ_API_KEY;
+
+  // 1. Try Gemini API first (Primary)
+  if (geminiApiKey && geminiApiKey !== 'your_gemini_api_key_here') {
+    try {
+      const geminiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${geminiApiKey}`;
+      const geminiResponse = await fetch(geminiUrl, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          contents: [
+            {
+              parts: [
+                { text: systemInstruction },
+                { text: promptText }
+              ]
+            }
+          ],
+          generationConfig: {
+            responseMimeType: "application/json",
+            temperature: 0.3
+          }
+        })
+      });
+
+      if (geminiResponse.ok) {
+        const data = await geminiResponse.json();
+        const candidateText = data.candidates?.[0]?.content?.parts?.[0]?.text;
+        if (candidateText) {
+          const parsed = JSON.parse(candidateText);
+          return { data: parsed, provider: 'gemini' };
+        }
+      } else {
+        console.warn(`[AI Failover] Gemini API responded with status ${geminiResponse.status}. Attempting Groq fallback...`);
+      }
+    } catch (err) {
+      console.warn(`[AI Failover] Gemini error (${err.message}). Attempting Groq fallback...`);
+    }
+  }
+
+  // 2. Try Groq API second (Failover Provider: Llama 3.3 70B)
+  if (groqApiKey && groqApiKey !== 'your_groq_api_key_here') {
+    try {
+      const groqUrl = 'https://api.groq.com/openai/v1/chat/completions';
+      const groqResponse = await fetch(groqUrl, {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${groqApiKey}`,
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          model: 'llama-3.3-70b-versatile',
+          messages: [
+            {
+              role: 'system',
+              content: `${systemInstruction}\nYou MUST reply strictly in valid JSON matching this schema:\n${schemaDescription}`
+            },
+            {
+              role: 'user',
+              content: promptText
+            }
+          ],
+          response_format: { type: 'json_object' },
+          temperature: 0.3
+        })
+      });
+
+      if (groqResponse.ok) {
+        const groqData = await groqResponse.json();
+        const content = groqData.choices?.[0]?.message?.content;
+        if (content) {
+          const parsed = JSON.parse(content);
+          return { data: parsed, provider: 'groq' };
+        }
+      } else {
+        console.warn(`[AI Failover] Groq API responded with status ${groqResponse.status}.`);
+      }
+    } catch (err) {
+      console.warn(`[AI Failover] Groq error (${err.message}).`);
+    }
+  }
+
+  return null;
+}
+
 export default async function handler(req, res) {
   // CORS Headers
   res.setHeader('Access-Control-Allow-Credentials', true);
@@ -83,46 +173,26 @@ export default async function handler(req, res) {
     assessmentSummary = null,
   } = req.body || {};
 
-  const apiKey = process.env.GEMINI_API_KEY;
+  // Build system prompt based on assessment stage
+  let systemInstruction = `You are Doro, a friendly, encouraging, and highly competent German A1 tutor specializing in Goethe-Zertifikat A1 (Start Deutsch 1) and ÖSD Zertifikat A1 preparation. Answer in clear English with German examples and explanations to make learning intuitive for beginners.`;
 
-  // If no Gemini API key is provided, use structured fallback
-  if (!apiKey || apiKey === 'your_gemini_api_key_here') {
-    const fallback = generateFallbackResponse(stage, message, assessmentSummary);
-    return res.status(200).json({
-      ...fallback,
-      isFallback: true,
-      notice: "Response generated from curated local knowledge base (GEMINI_API_KEY not configured)."
-    });
-  }
-
-  try {
-    const knowledge = getKnowledgeContext(currentQuestionTopic);
-
-    // Build system prompt based on assessment stage
-    let systemInstruction = `You are Doro, a friendly, encouraging, and highly competent German A1 tutor specializing in Goethe-Zertifikat A1 (Start Deutsch 1) and ÖSD Zertifikat A1 preparation. Answer in clear English with German examples and explanations to make learning intuitive for beginners.`;
-
-    if (stage === 'during_assessment') {
-      systemInstruction += `
-CRITICAL INTEGRITY RULE: The learner is CURRENTLY taking the active 12-question diagnostic assessment.
+  if (stage === 'during_assessment') {
+    systemInstruction += `
+CRITICAL INTEGRITY RULE: The learner is CURRENTLY taking the active 12-task diagnostic assessment.
 - You MAY explain German grammar rules, vocabulary concepts, sentence structure, or word meanings in friendly, encouraging English with German examples.
 - You MUST NEVER give away the direct answer to any question or tell them which letter (A, B, C, D) is correct.
 - If they ask: "What is the answer to question X?", politely refuse: "I cannot give away direct test answers during the assessment, but I would be glad to explain the underlying grammar rule!"
 - Active Topic Context: ${currentQuestionTopic || 'General German A1'}`;
-    } else {
-      systemInstruction += `
+  } else {
+    systemInstruction += `
 The learner has COMPLETED the diagnostic assessment.
 - Assessment Score: ${assessmentSummary?.score || 0} / 12 (${assessmentSummary?.percentage || 0}%)
 - Weak Skills: ${(assessmentSummary?.weakSkills || []).join(', ')}
 - Missed Topics: ${(assessmentSummary?.incorrectTopics || []).join(', ')}
 - Your goal: Break down mistakes pedagogically in English, explain why their chosen German answer was incorrect, reinforce the correct grammar/lexical rule with simple examples, and recommend specific study activities.`;
-    }
+  }
 
-    const promptText = `
-User Query: "${message || 'Can you explain my mistakes and the most important rules to review?'}"
-${currentQuestionTopic ? `Topic: ${currentQuestionTopic}` : ''}
-
-Respond STRICTLY in valid JSON matching this schema:
-{
+  const schemaDescription = `{
   "summary": "Brief encouraging summary of the concept or feedback (1-2 sentences)",
   "identified_weaknesses": ["Topic 1", "Topic 2"],
   "explanation": "Clear, friendly pedagogical explanation with German examples and English translations",
@@ -134,52 +204,33 @@ Respond STRICTLY in valid JSON matching this schema:
     }
   ],
   "encouragement": "Warm motivational closing phrase"
-}
+}`;
+
+  const promptText = `
+User Query: "${message || 'Can you explain my mistakes and the most important rules to review?'}"
+${currentQuestionTopic ? `Topic: ${currentQuestionTopic}` : ''}
 `;
 
-    const geminiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${apiKey}`;
+  // Attempt Multi-Provider Execution (Gemini -> Groq -> Local Knowledge Base)
+  const aiResult = await callLLMWithGroqFallback({
+    systemInstruction,
+    promptText,
+    schemaDescription,
+  });
 
-    const geminiResponse = await fetch(geminiUrl, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        contents: [
-          {
-            parts: [
-              { text: systemInstruction },
-              { text: promptText }
-            ]
-          }
-        ],
-        generationConfig: {
-          responseMimeType: "application/json",
-          temperature: 0.4
-        }
-      })
-    });
-
-    if (!geminiResponse.ok) {
-      throw new Error(`Gemini API returned status ${geminiResponse.status}`);
-    }
-
-    const data = await geminiResponse.json();
-    const candidateText = data.candidates?.[0]?.content?.parts?.[0]?.text;
-
-    if (!candidateText) {
-      throw new Error("Empty candidate response from Gemini API");
-    }
-
-    const parsedJson = JSON.parse(candidateText);
-    return res.status(200).json(parsedJson);
-
-  } catch (error) {
-    console.error("Doro API error:", error.message);
-    // Graceful fallback on API error
-    const fallback = generateFallbackResponse(stage, message, assessmentSummary);
+  if (aiResult && aiResult.data) {
     return res.status(200).json({
-      ...fallback,
-      isFallback: true,
-      errorNotice: "Gemini API temporarily unavailable. Predefined curated A1 guidance provided."
+      ...aiResult.data,
+      provider: aiResult.provider, // 'gemini' or 'groq'
     });
   }
+
+  // Tertiary Fallback: Curated local knowledge-base
+  const fallback = generateFallbackResponse(stage, message, assessmentSummary);
+  return res.status(200).json({
+    ...fallback,
+    isFallback: true,
+    provider: 'local_knowledge_base',
+    notice: "Response generated from curated local knowledge base (Gemini/Groq unavailable).",
+  });
 }
