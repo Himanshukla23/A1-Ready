@@ -14,7 +14,7 @@ async function callSpeakingAIWithGroqFallback({ systemInstruction, userPrompt, s
   // 1. Try Gemini first (Primary)
   if (geminiApiKey && geminiApiKey !== 'your_gemini_api_key_here') {
     try {
-      const geminiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${geminiApiKey}`;
+      const geminiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-3-flash-preview:generateContent?key=${geminiApiKey}`;
       const geminiResponse = await fetch(geminiUrl, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -60,7 +60,7 @@ async function callSpeakingAIWithGroqFallback({ systemInstruction, userPrompt, s
           'Content-Type': 'application/json'
         },
         body: JSON.stringify({
-          model: 'llama-3.3-70b-versatile',
+          model: 'openai/gpt-oss-120b',
           messages: [
             {
               role: 'system',
@@ -161,8 +161,60 @@ Learner Transcribed Spoken Response: "${transcript || '(No speech recorded)'}"
   });
 
   if (aiResult && aiResult.data) {
+    const raw = aiResult.data.evaluation || aiResult.data;
+
+    // Calculate or extract score
+    let score = raw.score ?? raw.normalized_overall_score;
+    if (typeof score !== 'number' && raw.scores) {
+      const s = raw.scores;
+      score =
+        (s.task_relevance || 0) * 0.3 +
+        (s.grammar_syntax || s.grammar || 0) * 0.3 +
+        (s.a1_vocabulary || s.vocabulary || 0) * 0.25 +
+        (s.response_completeness || s.completeness || 0) * 0.15;
+    }
+    score = typeof score === 'number' ? Math.round(score * 10) / 10 : 2.5;
+
+    // Dimensions
+    const scores = raw.scores || {};
+    const dims = raw.dimensions || {
+      task_relevance: {
+        score: scores.task_relevance ?? 3,
+        feedback: 'Directly addresses the task prompt.',
+      },
+      grammar: {
+        score: scores.grammar_syntax ?? scores.grammar ?? 3,
+        feedback: 'Appropriate A1 word order.',
+      },
+      vocabulary: {
+        score: scores.a1_vocabulary ?? scores.vocabulary ?? 3,
+        feedback: 'Relevant A1 vocabulary used.',
+      },
+      completeness: {
+        score: scores.response_completeness ?? scores.completeness ?? 3,
+        feedback: 'Complete sentence structure.',
+      },
+    };
+
+    const strengths =
+      Array.isArray(raw.strengths) && raw.strengths.length > 0
+        ? raw.strengths
+        : ['Clear A1 sentence structure', 'Addressed the prompt directly'];
+
+    const improvements =
+      Array.isArray(raw.improvements) && raw.improvements.length > 0
+        ? raw.improvements
+        : score < 3
+        ? ['Expand with an additional detail or polite particle (bitte / danke)']
+        : ['Continue maintaining this strong sentence flow'];
+
     return res.status(200).json({
-      ...aiResult.data,
+      ...raw,
+      score,
+      dimensions: dims,
+      strengths,
+      improvements,
+      feedback: raw.feedback || 'Good spoken response.',
       provider: aiResult.provider,
     });
   }

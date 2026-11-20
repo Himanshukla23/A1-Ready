@@ -34,10 +34,28 @@ export async function askDoro({
 
     // Client-side fallback if serverless endpoint is not hosted locally
     if (stage === 'during_assessment') {
+      const lower = (message || '').toLowerCase();
+      if (lower.includes('hello') || lower.includes('hi') || lower.includes('hallo') || lower.includes('hey')) {
+        return {
+          summary: "Doro Greeting & Introduction",
+          identified_weaknesses: [],
+          explanation: "Hallo! I am Doro, your German A1 exam companion. How can I help you today? You can ask me to explain grammar rules, clarify vocabulary meanings, or guide your sentence structure.",
+          recommendations: [
+            {
+              topic: "A1 Diagnostic Support",
+              reason: "Helpful companion for Goethe and ÖSD A1 preparation.",
+              practice_activity: "Ask about word order, accusative case, or common vocabulary for your current task.",
+            },
+          ],
+          encouragement: "Viel Erfolg! You can do this.",
+          isClientFallback: true,
+        };
+      }
+
       return {
         summary: "Doro Guidance (Active Assessment)",
         identified_weaknesses: [],
-        explanation: `Hello! As your exam companion, I cannot reveal direct test answers (A, B, C, or D) while your test is in progress.
+        explanation: `As your exam companion, I cannot reveal direct test answers (A, B, C, or D) while your test is in progress.
 
 💡 Core Grammar Tips:
 - Masculine nouns take the ending '-en' in the accusative (der Tisch -> einen / den Tisch). Feminine and neuter nouns do not change!

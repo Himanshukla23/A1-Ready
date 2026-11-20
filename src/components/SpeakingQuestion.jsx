@@ -80,14 +80,14 @@ export default function SpeakingQuestion({ question }) {
     if (provider === 'gemini') {
       return (
         <span className="inline-flex items-center gap-1 text-[10px] font-semibold text-emerald-800 bg-emerald-50 border border-emerald-200 px-2 py-0.5 rounded-full">
-          ⚡ Evaluated by Gemini 2.5 Flash
+          ⚡ Evaluated by Gemini Flash
         </span>
       );
     }
     if (provider === 'groq') {
       return (
         <span className="inline-flex items-center gap-1 text-[10px] font-semibold text-amber-800 bg-amber-50 border border-amber-200 px-2 py-0.5 rounded-full">
-          ⚡ Evaluated by Groq LLaMA 3.3 (Failover)
+          ⚡ Evaluated by Groq Cloud (Failover)
         </span>
       );
     }

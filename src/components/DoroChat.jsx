@@ -105,7 +105,11 @@ export default function DoroChat() {
         ...prev,
         {
           sender: 'doro',
-          text: aiResponse.explanation || aiResponse.summary,
+          text:
+            aiResponse.explanation ||
+            aiResponse.response ||
+            aiResponse.summary ||
+            'Hallo! How can I help you with your German preparation today?',
           data: aiResponse,
         },
       ]);
@@ -128,14 +132,14 @@ export default function DoroChat() {
     if (data.provider === 'gemini') {
       return (
         <span className="text-[10px] font-semibold text-emerald-800 bg-emerald-50 border border-emerald-200 px-2 py-0.5 rounded-full inline-flex items-center gap-1 shadow-2xs">
-          ⚡ Gemini 2.5 Flash
+          ⚡ Gemini Flash
         </span>
       );
     }
     if (data.provider === 'groq') {
       return (
         <span className="text-[10px] font-semibold text-amber-800 bg-amber-50 border border-amber-200 px-2 py-0.5 rounded-full inline-flex items-center gap-1 shadow-2xs">
-          ⚡ Groq LLaMA 3.3 (Failover)
+          ⚡ Groq Cloud (Failover)
         </span>
       );
     }
@@ -248,15 +252,19 @@ export default function DoroChat() {
                   <span className="text-[11px] font-bold text-slate-500 uppercase tracking-wider block">
                     Targeted Practice Drill:
                   </span>
-                  {msg.data.recommendations.map((rec, rIdx) => (
-                    <div
-                      key={rIdx}
-                      className="p-2.5 rounded-xl bg-amber-50/70 border border-amber-200/80 text-xs text-slate-800"
-                    >
-                      <strong className="text-amber-900 block">{rec.topic}</strong>
-                      <p className="mt-1 text-slate-600">{rec.practice_activity}</p>
-                    </div>
-                  ))}
+                  {msg.data.recommendations.map((rec, rIdx) => {
+                    const topicText = typeof rec === 'string' ? rec : rec.topic;
+                    const activityText = typeof rec === 'string' ? '' : rec.practice_activity;
+                    return (
+                      <div
+                        key={rIdx}
+                        className="p-2.5 rounded-xl bg-amber-50/70 border border-amber-200/80 text-xs text-slate-800"
+                      >
+                        <strong className="text-amber-900 block">{topicText}</strong>
+                        {activityText && <p className="mt-1 text-slate-600">{activityText}</p>}
+                      </div>
+                    );
+                  })}
                 </div>
               )}
 
