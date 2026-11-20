@@ -24,7 +24,7 @@ export default function SkillBreakdown({ skills }) {
   };
 
   return (
-    <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3">
+    <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-3">
       {skillConfig.map((item) => {
         const { title, german, data, icon: Icon } = item;
         if (!data) return null;
@@ -33,16 +33,16 @@ export default function SkillBreakdown({ skills }) {
         return (
           <div
             key={item.key}
-            className="bg-white rounded-2xl border border-slate-200 p-4 shadow-xs flex flex-col justify-between"
+            className="bg-white rounded-2xl border border-slate-200 p-4 shadow-2xs hover:shadow-sm transition flex flex-col justify-between min-h-[148px]"
           >
             <div>
               <div className="flex items-center gap-2 mb-2">
-                <div className="w-8 h-8 rounded-lg bg-slate-100 flex items-center justify-center text-slate-700">
+                <div className="w-8 h-8 rounded-lg bg-slate-100 flex items-center justify-center text-slate-700 shrink-0">
                   <Icon className="w-4 h-4" />
                 </div>
-                <div>
-                  <h4 className="text-xs font-bold text-slate-900 leading-snug">{title}</h4>
-                  <p className="text-[10px] text-slate-400 font-medium">{german}</p>
+                <div className="min-w-0">
+                  <h4 className="text-xs font-bold text-slate-900 leading-snug truncate">{title}</h4>
+                  <p className="text-[10px] text-slate-400 font-medium truncate">{german}</p>
                 </div>
               </div>
 

@@ -286,23 +286,30 @@ ${readinessCategory.advice}
         {/* Strengths & Focus Areas Summary */}
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
           {/* Strengths */}
-          <div className="bg-white rounded-2xl border border-slate-200 p-5 shadow-xs">
-            <div className="flex items-center gap-2 mb-3 text-emerald-800 font-bold text-sm">
-              <CheckCircle2 className="w-4 h-4 text-emerald-600" />
-              <span>Your Identified Strengths</span>
+          <div className="bg-white rounded-2xl border border-slate-200 p-5 shadow-xs flex flex-col justify-between">
+            <div>
+              <div className="flex items-center gap-2 mb-3 text-emerald-800 font-bold text-sm">
+                <CheckCircle2 className="w-4 h-4 text-emerald-600" />
+                <span>Your Identified Strengths</span>
+              </div>
+              {identifiedStrengths.length > 0 ? (
+                <ul className="space-y-2">
+                  {identifiedStrengths.map((item) => (
+                    <li key={item.skill} className="flex items-center justify-between text-xs sm:text-sm p-2.5 rounded-xl bg-emerald-50/70 border border-emerald-200/70">
+                      <span className="font-medium text-slate-800">{item.label}</span>
+                      <span className="font-bold text-emerald-700">{item.score} ({item.percentage}%)</span>
+                    </li>
+                  ))}
+                </ul>
+              ) : (
+                <div className="p-3.5 rounded-xl bg-slate-50 border border-slate-200 text-xs text-slate-600">
+                  <p className="font-semibold text-slate-700">No modules have reached 75% yet.</p>
+                  <p className="mt-1 text-slate-500 leading-relaxed">
+                    Focus on the practice areas on the right. With regular practice and Doro AI guidance, your scores will improve rapidly!
+                  </p>
+                </div>
+              )}
             </div>
-            {identifiedStrengths.length > 0 ? (
-              <ul className="space-y-2">
-                {identifiedStrengths.map((item) => (
-                  <li key={item.skill} className="flex items-center justify-between text-xs sm:text-sm p-2 rounded-lg bg-emerald-50/60 border border-emerald-200/60">
-                    <span className="font-medium text-slate-800">{item.label}</span>
-                    <span className="font-bold text-emerald-700">{item.score} ({item.percentage}%)</span>
-                  </li>
-                ))}
-              </ul>
-            ) : (
-              <p className="text-xs text-slate-500 italic">No modules scored $\ge 75\%$ yet.</p>
-            )}
           </div>
 
           {/* Weaknesses */}
@@ -328,7 +335,7 @@ ${readinessCategory.advice}
 
         {/* Speaking Assessment Performance Review */}
         <div className="bg-white rounded-3xl border border-slate-200 p-6 sm:p-8 shadow-xs space-y-6">
-          <div className="flex items-center justify-between border-b border-slate-100 pb-4">
+          <div className="flex flex-wrap items-center justify-between gap-3 border-b border-slate-100 pb-4">
             <div className="flex items-center gap-3">
               <div className="w-10 h-10 rounded-xl bg-rose-100 text-rose-700 flex items-center justify-center font-bold">
                 <Mic className="w-5 h-5" />
@@ -343,7 +350,7 @@ ${readinessCategory.advice}
               </div>
             </div>
 
-            <span className="text-sm font-extrabold px-3 py-1 rounded-full bg-rose-50 text-rose-800 border border-rose-200">
+            <span className="text-sm font-extrabold px-3 py-1 rounded-full bg-rose-50 text-rose-800 border border-rose-200 shrink-0">
               {skills.speaking.correct} / 2.0 Points
             </span>
           </div>
