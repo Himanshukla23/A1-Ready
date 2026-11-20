@@ -9,6 +9,7 @@ import {
   Sparkles,
   CheckCircle2,
   Loader2,
+  Cpu,
 } from 'lucide-react';
 
 export default function SpeakingQuestion({ question }) {
@@ -74,6 +75,29 @@ export default function SpeakingQuestion({ question }) {
   };
 
   const evalResult = currentResponse.evaluation;
+
+  const renderProviderBadge = (provider) => {
+    if (provider === 'gemini') {
+      return (
+        <span className="inline-flex items-center gap-1 text-[10px] font-semibold text-emerald-800 bg-emerald-50 border border-emerald-200 px-2 py-0.5 rounded-full">
+          ⚡ Evaluated by Gemini 2.5 Flash
+        </span>
+      );
+    }
+    if (provider === 'groq') {
+      return (
+        <span className="inline-flex items-center gap-1 text-[10px] font-semibold text-amber-800 bg-amber-50 border border-amber-200 px-2 py-0.5 rounded-full">
+          ⚡ Evaluated by Groq LLaMA 3.3 (Failover)
+        </span>
+      );
+    }
+    return (
+      <span className="inline-flex items-center gap-1 text-[10px] font-semibold text-slate-700 bg-slate-100 border border-slate-200 px-2 py-0.5 rounded-full">
+        <Cpu className="w-3 h-3 text-slate-500" />
+        <span>Predefined CEFR Rubric Engine</span>
+      </span>
+    );
+  };
 
   return (
     <div className="bg-white rounded-3xl border border-slate-200 shadow-sm p-6 sm:p-8 space-y-6">
@@ -142,7 +166,7 @@ export default function SpeakingQuestion({ question }) {
           type="button"
           onClick={handleEvaluateSpeaking}
           disabled={!currentResponse.transcript?.trim() || isEvaluating}
-          className="inline-flex items-center gap-2 px-6 py-2.5 rounded-xl font-bold text-sm bg-amber-600 hover:bg-amber-700 disabled:bg-slate-300 text-white shadow-sm transition"
+          className="inline-flex items-center gap-2 px-6 py-2.5 rounded-xl font-bold text-sm bg-amber-600 hover:bg-amber-700 disabled:bg-slate-300 text-white shadow-sm transition active:scale-95"
         >
           {isEvaluating ? (
             <>
@@ -161,10 +185,14 @@ export default function SpeakingQuestion({ question }) {
       {/* Immediate Rubric Feedback Card (if evaluated) */}
       {evalResult && (
         <div className="p-5 rounded-2xl bg-slate-50 border border-slate-200 space-y-4 animate-in fade-in">
-          <div className="flex items-center justify-between border-b border-slate-200/60 pb-3">
-            <span className="text-xs font-bold text-slate-700 uppercase tracking-wider">
-              Rubric Feedback ({evalResult.score} / 3.0)
-            </span>
+          <div className="flex flex-wrap items-center justify-between gap-2 border-b border-slate-200/60 pb-3">
+            <div className="flex items-center gap-2">
+              <span className="text-xs font-bold text-slate-700 uppercase tracking-wider">
+                Rubric Feedback ({evalResult.score} / 3.0)
+              </span>
+              {renderProviderBadge(evalResult.provider)}
+            </div>
+
             <span className="text-xs font-bold text-amber-700 bg-amber-50 px-2.5 py-0.5 rounded-full border border-amber-200">
               {evalResult.score >= 2.5
                 ? 'Strong A1'
@@ -178,7 +206,7 @@ export default function SpeakingQuestion({ question }) {
           {evalResult.dimensions && (
             <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 text-center">
               {Object.entries(evalResult.dimensions).map(([key, dim]) => (
-                <div key={key} className="bg-white p-2.5 rounded-xl border border-slate-200">
+                <div key={key} className="bg-white p-2.5 rounded-xl border border-slate-200 shadow-2xs">
                   <p className="text-[11px] font-bold text-slate-500 uppercase">{key.replace('_', ' ')}</p>
                   <p className="text-base font-extrabold text-slate-900 mt-0.5">{dim.score} / 3</p>
                   <p className="text-[10px] text-slate-500 line-clamp-1 mt-0.5">{dim.feedback}</p>

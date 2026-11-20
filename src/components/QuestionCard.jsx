@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { useAssessment } from '../context/AssessmentContext';
 import { Compass, Check } from 'lucide-react';
 
@@ -9,6 +9,30 @@ export default function QuestionCard({ question }) {
 
   const selectedOptionId = answers[question.id] || null;
 
+  // Enable fast keyboard shortcuts: 1, 2, 3, 4 or A, B, C, D
+  useEffect(() => {
+    const handleKeyDown = (e) => {
+      // Don't intercept if user is typing in an input or textarea
+      const tag = document.activeElement?.tagName;
+      if (tag === 'INPUT' || tag === 'TEXTAREA') return;
+
+      const key = e.key.toUpperCase();
+      let matchedOption = null;
+
+      if (key === '1' || key === 'A') matchedOption = question.options[0];
+      else if (key === '2' || key === 'B') matchedOption = question.options[1];
+      else if (key === '3' || key === 'C') matchedOption = question.options[2];
+      else if (key === '4' || key === 'D') matchedOption = question.options[3];
+
+      if (matchedOption) {
+        selectAnswer(question.id, matchedOption.id);
+      }
+    };
+
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [question, selectAnswer]);
+
   return (
     <div className="bg-white rounded-2xl border border-slate-200 shadow-sm p-6 sm:p-8">
       {/* Category & Topic header */}
@@ -17,9 +41,14 @@ export default function QuestionCard({ question }) {
           <span className="text-xs font-bold uppercase tracking-wider text-slate-400">Topic</span>
           <h3 className="text-sm sm:text-base font-bold text-slate-800">{question.topic}</h3>
         </div>
-        <span className="text-xs font-medium text-slate-600 bg-slate-100 px-3 py-1 rounded-md">
-          {question.instruction}
-        </span>
+        <div className="flex items-center gap-2">
+          <span className="text-xs font-medium text-slate-600 bg-slate-100 px-3 py-1 rounded-md">
+            {question.instruction}
+          </span>
+          <span className="hidden sm:inline-block text-[11px] font-mono text-slate-400 bg-slate-50 border border-slate-200 px-2 py-0.5 rounded">
+            Keys: 1-4 / A-D
+          </span>
+        </div>
       </div>
 
       {/* Reading Passage (if available) */}
@@ -44,7 +73,7 @@ export default function QuestionCard({ question }) {
 
       {/* Multiple-Choice Options */}
       <div className="space-y-3">
-        {question.options.map((option) => {
+        {question.options.map((option, idx) => {
           const isSelected = selectedOptionId === option.id;
 
           return (
@@ -76,13 +105,19 @@ export default function QuestionCard({ question }) {
                 </span>
               </div>
 
-              {isSelected ? (
-                <div className="w-6 h-6 rounded-full bg-sky-600 text-white flex items-center justify-center shrink-0">
-                  <Check className="w-4 h-4 stroke-[2.5]" />
-                </div>
-              ) : (
-                <div className="w-6 h-6 rounded-full border border-slate-300 group-hover:border-slate-400 shrink-0"></div>
-              )}
+              <div className="flex items-center gap-2">
+                <span className="hidden sm:inline-block text-[10px] font-mono text-slate-400 opacity-60 group-hover:opacity-100 transition">
+                  [{idx + 1}]
+                </span>
+
+                {isSelected ? (
+                  <div className="w-6 h-6 rounded-full bg-sky-600 text-white flex items-center justify-center shrink-0">
+                    <Check className="w-4 h-4 stroke-[2.5]" />
+                  </div>
+                ) : (
+                  <div className="w-6 h-6 rounded-full border border-slate-300 group-hover:border-slate-400 shrink-0"></div>
+                )}
+              </div>
             </button>
           );
         })}

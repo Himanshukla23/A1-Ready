@@ -12,6 +12,7 @@ import {
   User,
   ShieldAlert,
   Volume2,
+  Cpu,
 } from 'lucide-react';
 
 export default function DoroChat() {
@@ -121,6 +122,30 @@ export default function DoroChat() {
     }
   };
 
+  const renderDoroProviderBadge = (data) => {
+    if (!data) return null;
+
+    if (data.provider === 'gemini') {
+      return (
+        <span className="text-[10px] font-semibold text-emerald-800 bg-emerald-50 border border-emerald-200 px-2 py-0.5 rounded-full inline-flex items-center gap-1 shadow-2xs">
+          ⚡ Gemini 2.5 Flash
+        </span>
+      );
+    }
+    if (data.provider === 'groq') {
+      return (
+        <span className="text-[10px] font-semibold text-amber-800 bg-amber-50 border border-amber-200 px-2 py-0.5 rounded-full inline-flex items-center gap-1 shadow-2xs">
+          ⚡ Groq LLaMA 3.3 (Failover)
+        </span>
+      );
+    }
+    return (
+      <span className="text-[10px] font-semibold text-sky-800 bg-sky-50 border border-sky-200 px-2 py-0.5 rounded-full inline-flex items-center gap-1 shadow-2xs">
+        📚 Curated Knowledge Base
+      </span>
+    );
+  };
+
   const quickPrompts =
     stage === 'assessment'
       ? [
@@ -148,10 +173,11 @@ export default function DoroChat() {
             <Sparkles className="w-5 h-5 text-amber-200" />
           </div>
           <div>
-            <div className="flex items-center gap-1.5">
+            <div className="flex items-center gap-2">
               <span className="font-extrabold text-sm tracking-tight">Doro AI</span>
-              <span className="text-[10px] uppercase font-bold bg-white/20 px-1.5 py-0.5 rounded text-white">
-                Voice Tutor
+              <span className="text-[10px] uppercase font-bold bg-white/20 px-1.5 py-0.5 rounded text-white flex items-center gap-1">
+                <span className="w-1.5 h-1.5 rounded-full bg-emerald-300"></span>
+                Gemini + Groq
               </span>
             </div>
             <p className="text-xs text-amber-100 font-medium">
@@ -239,6 +265,13 @@ export default function DoroChat() {
                   "{msg.data.encouragement}"
                 </p>
               )}
+
+              {/* AI Provider Tag */}
+              {msg.sender === 'doro' && msg.data && (
+                <div className="pt-1 flex items-center justify-between">
+                  {renderDoroProviderBadge(msg.data)}
+                </div>
+              )}
             </div>
 
             {msg.sender === 'user' && (
@@ -256,7 +289,7 @@ export default function DoroChat() {
             </div>
             <div className="bg-white border border-slate-200 p-3 rounded-2xl rounded-tl-xs shadow-xs flex items-center gap-2 text-xs text-slate-500">
               <Loader2 className="w-4 h-4 animate-spin text-amber-500" />
-              <span>Doro is formulating an explanation...</span>
+              <span>Doro is analyzing with Gemini/Groq...</span>
             </div>
           </div>
         )}
@@ -271,7 +304,7 @@ export default function DoroChat() {
             key={idx}
             onClick={() => handleSend(prompt)}
             disabled={loading}
-            className="text-[11px] whitespace-nowrap bg-slate-100 hover:bg-slate-200 text-slate-700 px-2.5 py-1 rounded-full font-medium transition"
+            className="text-[11px] whitespace-nowrap bg-slate-100 hover:bg-slate-200 text-slate-700 px-2.5 py-1 rounded-full font-medium transition cursor-pointer"
           >
             {prompt}
           </button>
@@ -298,7 +331,7 @@ export default function DoroChat() {
           <button
             type="submit"
             disabled={loading || !input.trim()}
-            className="w-10 h-10 rounded-xl bg-amber-500 hover:bg-amber-600 disabled:bg-slate-200 text-white flex items-center justify-center transition shadow-xs"
+            className="w-10 h-10 rounded-xl bg-amber-500 hover:bg-amber-600 disabled:bg-slate-200 text-white flex items-center justify-center transition shadow-xs cursor-pointer"
             aria-label="Send Message"
           >
             <Send className="w-4 h-4" />

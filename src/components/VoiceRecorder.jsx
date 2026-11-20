@@ -7,6 +7,7 @@ import {
   Edit3,
   Check,
   AlertCircle,
+  Radio,
 } from 'lucide-react';
 import {
   isSpeechRecognitionSupported,
@@ -139,29 +140,43 @@ export default function VoiceRecorder({
   const formatTime = (secs) => {
     const mins = Math.floor(secs / 60);
     const rem = secs % 60;
-    return `${mins}:${rem < 10 ? '0' : ''}${rem}`;
+    return `${mins < 10 ? '0' : ''}${mins}:${rem < 10 ? '0' : ''}${rem}`;
   };
 
   return (
     <div className="rounded-2xl border border-slate-200 bg-slate-50/70 p-5 space-y-4">
-      {/* Top Controls */}
+      {/* Top Controls & Audio Visualizer */}
       <div className="flex flex-wrap items-center justify-between gap-3">
         <div className="flex items-center gap-3">
           {isRecording ? (
-            <button
-              type="button"
-              onClick={stopRecording}
-              className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-rose-600 hover:bg-rose-700 text-white font-bold text-sm shadow-md shadow-rose-600/25 transition animate-pulse"
-            >
-              <Square className="w-4 h-4 fill-white" />
-              <span>Stop Recording ({formatTime(seconds)})</span>
-            </button>
+            <div className="flex items-center gap-3">
+              <button
+                type="button"
+                onClick={stopRecording}
+                className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-rose-600 hover:bg-rose-700 text-white font-bold text-sm shadow-md shadow-rose-600/30 transition animate-pulse"
+              >
+                <Square className="w-4 h-4 fill-white" />
+                <span>Stop Recording</span>
+              </button>
+
+              {/* Soundwave visualizer bars */}
+              <div className="flex items-center gap-1 px-3 py-2 rounded-xl bg-rose-50 border border-rose-200">
+                <span className="w-1.5 bg-rose-600 rounded-full animate-wave-1"></span>
+                <span className="w-1.5 bg-rose-500 rounded-full animate-wave-2"></span>
+                <span className="w-1.5 bg-rose-600 rounded-full animate-wave-3"></span>
+                <span className="w-1.5 bg-rose-500 rounded-full animate-wave-4"></span>
+                <span className="w-1.5 bg-rose-600 rounded-full animate-wave-5"></span>
+                <span className="ml-2 font-mono text-xs font-bold text-rose-700">
+                  {formatTime(seconds)} <span className="text-rose-400 font-normal">/ 00:30</span>
+                </span>
+              </div>
+            </div>
           ) : (
             <button
               type="button"
               onClick={startRecording}
               disabled={isEvaluating}
-              className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-sky-600 hover:bg-sky-700 disabled:bg-slate-300 text-white font-bold text-sm shadow-md shadow-sky-600/20 transition"
+              className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-sky-600 hover:bg-sky-700 disabled:bg-slate-300 text-white font-bold text-sm shadow-md shadow-sky-600/20 transition transform active:scale-95"
             >
               <Mic className="w-4 h-4" />
               <span>{transcript ? 'Re-Record Voice' : 'Start Recording'}</span>
@@ -202,11 +217,21 @@ export default function VoiceRecorder({
       {/* Live Voice Transcript Display */}
       <div className="bg-white border border-slate-200 rounded-xl p-4 min-h-[90px] shadow-xs">
         <div className="flex items-center justify-between mb-2">
-          <span className="text-[11px] font-bold text-slate-400 uppercase tracking-wider">
-            {isRecording ? 'Listening (Live German Transcript)...' : 'Recorded Response Transcript'}
-          </span>
-          {transcript && (
-            <span className="text-xs text-emerald-700 font-semibold inline-flex items-center gap-1 bg-emerald-50 px-2 py-0.5 rounded-md">
+          <div className="flex items-center gap-2">
+            {isRecording ? (
+              <span className="flex items-center gap-1.5 text-xs font-bold text-rose-600">
+                <span className="w-2 h-2 rounded-full bg-rose-600 animate-ping"></span>
+                <span>Listening in German (de-DE)...</span>
+              </span>
+            ) : (
+              <span className="text-[11px] font-bold text-slate-400 uppercase tracking-wider">
+                Recorded Response Transcript
+              </span>
+            )}
+          </div>
+
+          {transcript && !isRecording && (
+            <span className="text-xs text-emerald-700 font-semibold inline-flex items-center gap-1 bg-emerald-50 px-2.5 py-0.5 rounded-md border border-emerald-200">
               <Check className="w-3.5 h-3.5" />
               <span>Voice Captured</span>
             </span>
