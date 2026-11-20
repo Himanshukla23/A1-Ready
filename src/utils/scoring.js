@@ -1,26 +1,24 @@
 import { OBJECTIVE_QUESTIONS } from '../data/questions.js';
+import { LISTENING_QUESTIONS } from '../data/listeningQuestions.js';
 import { SPEAKING_QUESTIONS } from '../data/speakingQuestions.js';
 
 /**
- * Version 2.0.0 Scoring Engine (4 Skills: Vocab, Grammar, Reading, Speaking)
- * Total Score: 12.0 (3.0 per skill)
- *
- * @param {Record<string, string>} objectiveAnswers - e.g., { q1: "A", q2: "B", ... }
- * @param {Record<string, object>} speakingEvaluations - e.g., { s1: { score: 2.5, ... }, ... }
- * @returns {object} Full four-skill diagnostic score report
+ * Version 3.0.0 Scoring Engine (5 Skills: Vocab, Grammar, Reading, Listening, Speaking)
+ * Total Score: 12.0 (3 + 3 + 2 + 2 + 2)
  */
 export function calculateAssessmentScore(objectiveAnswers = {}, speakingEvaluations = {}) {
-  // 1. Evaluate Objective Questions (Vocab, Grammar, Reading)
   const skills = {
     vocabulary: { correct: 0, total: 3, percentage: 0, label: "Vocabulary (Wortschatz)" },
     grammar: { correct: 0, total: 3, percentage: 0, label: "Grammar (Grammatik)" },
-    reading: { correct: 0, total: 3, percentage: 0, label: "Reading (Leseverstehen)" },
-    speaking: { correct: 0, total: 3, percentage: 0, label: "Speaking (Sprechen)" },
+    reading: { correct: 0, total: 2, percentage: 0, label: "Reading (Leseverstehen)" },
+    listening: { correct: 0, total: 2, percentage: 0, label: "Listening (Hörverstehen)" },
+    speaking: { correct: 0, total: 2, percentage: 0, label: "Speaking (Sprechen)" },
   };
 
   const incorrectQuestions = [];
   const correctQuestions = [];
 
+  // Evaluate objective questions (Vocabulary, Grammar, Reading)
   OBJECTIVE_QUESTIONS.forEach((q) => {
     const selectedOptionId = objectiveAnswers[q.id];
     const isCorrect = selectedOptionId === q.correctOptionId;
@@ -55,7 +53,40 @@ export function calculateAssessmentScore(objectiveAnswers = {}, speakingEvaluati
     }
   });
 
-  // 2. Evaluate Speaking Questions (Average of 3 speaking tasks, each 0 to 3)
+  // Evaluate listening questions (MCQ, deterministic)
+  LISTENING_QUESTIONS.forEach((q) => {
+    const selectedOptionId = objectiveAnswers[q.id];
+    const isCorrect = selectedOptionId === q.correctOptionId;
+
+    const selectedOptionObj = q.options.find((opt) => opt.id === selectedOptionId);
+    const correctOptionObj = q.options.find((opt) => opt.id === q.correctOptionId);
+
+    if (isCorrect) {
+      skills.listening.correct += 1;
+      correctQuestions.push({
+        id: q.id,
+        skill: q.skill,
+        topic: q.topic,
+        question: q.question,
+      });
+    } else {
+      incorrectQuestions.push({
+        id: q.id,
+        skill: q.skill,
+        skillLabel: q.skillLabel,
+        topic: q.topic,
+        question: q.question,
+        passage: null,
+        selectedOptionId: selectedOptionId || "Unanswered",
+        selectedOptionText: selectedOptionObj ? selectedOptionObj.text : "No answer",
+        correctOptionId: q.correctOptionId,
+        correctOptionText: correctOptionObj ? correctOptionObj.text : "",
+        explanation: q.explanation,
+      });
+    }
+  });
+
+  // Evaluate Speaking Questions (Average of 2 speaking tasks, each 0 to 3, normalized to max 2)
   const speakingPromptScores = [];
   SPEAKING_QUESTIONS.forEach((sp) => {
     const evalData = speakingEvaluations[sp.id];
@@ -65,8 +96,8 @@ export function calculateAssessmentScore(objectiveAnswers = {}, speakingEvaluati
 
   const rawSpeakingAverage =
     speakingPromptScores.reduce((acc, curr) => acc + curr, 0) / SPEAKING_QUESTIONS.length;
-  // Normalized speaking score out of 3.0
-  const normalizedSpeakingScore = Math.round(rawSpeakingAverage * 10) / 10;
+  // Normalized speaking score: average is 0-3, scale to 0-2
+  const normalizedSpeakingScore = Math.round((rawSpeakingAverage / 3) * 2 * 10) / 10;
   skills.speaking.correct = normalizedSpeakingScore;
 
   // Calculate skill percentages
@@ -80,15 +111,16 @@ export function calculateAssessmentScore(objectiveAnswers = {}, speakingEvaluati
     skills.vocabulary.correct +
     skills.grammar.correct +
     skills.reading.correct +
+    skills.listening.correct +
     skills.speaking.correct;
 
   const roundedTotalPoints = Math.round(totalCorrectPoints * 10) / 10;
   const overallPercentage = Math.round((totalCorrectPoints / 12) * 100);
 
-  // Identify Strengths (>= 2.5 / 3 or >= 80%) & Weaknesses (< 1.5 / 3 or < 50%)
+  // Identify Strengths & Weaknesses
   const identifiedStrengths = [];
   const identifiedWeaknesses = [];
-  const criticalSkillGaps = []; // Skills strictly below 50%
+  const criticalSkillGaps = [];
 
   Object.entries(skills).forEach(([key, data]) => {
     if (data.percentage >= 75) {
@@ -116,7 +148,7 @@ export function calculateAssessmentScore(objectiveAnswers = {}, speakingEvaluati
     }
   });
 
-  // Determine Readiness Classification (v2.0.0 rules)
+  // Determine Readiness Classification
   let readinessCategory;
   const hasSub50Skill = criticalSkillGaps.length > 0;
 
@@ -128,7 +160,7 @@ export function calculateAssessmentScore(objectiveAnswers = {}, speakingEvaluati
         badgeVariant: "emerald",
         headline: "Ready for Goethe / ÖSD A1 Registration",
         description:
-          "Outstanding balance across Vocabulary, Grammar, Reading, and Speaking! You comfortably meet the A1 passing standard and are well positioned to book your exam date.",
+          "Outstanding balance across all 5 skills! You comfortably meet the A1 passing standard and are well positioned to book your exam date.",
         advice: "Maintain your rhythm by doing full-length official timed sample exams and practicing your self-introduction.",
       };
     } else {
@@ -138,8 +170,8 @@ export function calculateAssessmentScore(objectiveAnswers = {}, speakingEvaluati
         badgeVariant: "sky",
         headline: "High Score with an Isolated Skill Gap",
         description:
-          "Your overall percentage is high, but at least one core skill scored below 50%. Both Goethe and ÖSD require balanced competence to avoid failing individual exam sub-tests.",
-        advice: `Focus your preparation specifically on your weakest skill (${criticalSkillGaps.map((s) => s.label).join(', ')}) before booking.`,
+          "Your overall percentage is high, but at least one core skill scored below 50%. Both Goethe and ÖSD require balanced competence.",
+        advice: `Focus on your weakest skill (${criticalSkillGaps.map((s) => s.label).join(', ')}) before booking.`,
       };
     }
   } else if (overallPercentage >= 70) {
@@ -149,7 +181,7 @@ export function calculateAssessmentScore(objectiveAnswers = {}, speakingEvaluati
       badgeVariant: "sky",
       headline: "Solid Foundation with Minor Skill Gaps",
       description:
-        "You demonstrate good grasp of A1 communication, but specific grammatical rules or speaking fluidity require 1-2 weeks of focused review.",
+        "You demonstrate good grasp of A1 communication, but specific areas require 1-2 weeks of focused review.",
       advice: "Dedicate 10-14 days to practicing the specific mistakes and drills listed in your study plan below.",
     };
   } else if (overallPercentage >= 50) {
@@ -159,8 +191,8 @@ export function calculateAssessmentScore(objectiveAnswers = {}, speakingEvaluati
       badgeVariant: "amber",
       headline: "Noticeable Gaps — Do Not Book Exam Yet",
       description:
-        "You have basic German awareness, but inconsistent grammar, limited vocabulary, or hesitant speaking put you at significant risk of failing an official exam.",
-      advice: "Review core grammar rules (accusative articles, verb conjugations) and practice spoken responses out loud before retesting in 2-3 weeks.",
+        "You have basic German awareness, but inconsistent grammar, limited vocabulary, or hesitant speaking put you at significant risk.",
+      advice: "Review core grammar rules and practice spoken responses out loud before retesting in 2-3 weeks.",
     };
   } else {
     readinessCategory = {
@@ -169,8 +201,8 @@ export function calculateAssessmentScore(objectiveAnswers = {}, speakingEvaluati
       badgeVariant: "rose",
       headline: "Foundational Review Required",
       description:
-        "You are in the early stages of German A1. Booking an official examination at this stage would likely result in lost registration fees and frustration.",
-      advice: "Follow a structured A1 course (Goethe/DW Nicos Weg/Hueber) from Chapter 1. Build basic vocabulary and sentence structures steadily.",
+        "You are in the early stages of German A1. Booking an official examination now would likely not succeed.",
+      advice: "Follow a structured A1 course (Goethe/DW Nicos Weg/Hueber) from Chapter 1.",
     };
   }
 

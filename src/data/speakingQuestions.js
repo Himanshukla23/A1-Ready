@@ -1,6 +1,6 @@
 /**
- * 3 Original A1 German Speaking Assessment Tasks
- * Aligned with Goethe-Zertifikat A1 (Sprechen Teil 1, 2, 3) & ÖSD Zertifikat A1.
+ * 2 Original A1 German Speaking Assessment Tasks
+ * Aligned with Goethe-Zertifikat A1 (Sprechen Teil 1, 2) & ÖSD Zertifikat A1.
  * Evaluated via AI-assisted predefined 4-dimension rubric (0 to 3 points each).
  */
 
@@ -29,17 +29,5 @@ export const SPEAKING_QUESTIONS = [
     modelResponse: "Guten Tag! Ich möchte bitte einen Kaffee mit Milch bestellen. Und kann ich bitte zahlen?",
     targetKeywords: ["möchte", "hätte", "Kaffee", "Tee", "bitte", "zahlen", "Rechnung"],
     tips: "Remember polite phrasing with 'Ich möchte bitte...' or 'Ich hätte gern...'.",
-  },
-  {
-    id: "s3",
-    skill: "speaking",
-    skillLabel: "Speaking (Sprechen)",
-    part: "Teil 3: Freizeit & Alltag (Free Time & Hobbies)",
-    instruction: "Click 'Record' and describe what you like to do on weekends (2 sentences).",
-    promptGerman: "Was machen Sie gern am Wochenende in Ihrer Freizeit? Erzählen Sie 2 bis 3 Sätze auf Deutsch.",
-    promptEnglish: "What do you like to do on weekends in your free time? Speak 2 to 3 sentences in German.",
-    modelResponse: "Am Wochenende treffe ich gern meine Freunde. Wir kochen zusammen oder ich fahre mit dem Fahrrad im Park.",
-    targetKeywords: ["Wochenende", "gern", "Freunde", "spielen", "kochen", "lesen", "fahren", "Sport"],
-    tips: "Remember the verb stays in position 2: 'Am Wochenende spiele ich Fußball.'",
   },
 ];

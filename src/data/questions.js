@@ -1,9 +1,9 @@
 /**
- * 9 Original A1 German Objective Assessment Questions
+ * 8 Original A1 German Objective Assessment Questions
  * 3 Vocabulary (Wortschatz) - q1 to q3
  * 3 Grammar (Grammatik) - q4 to q6
- * 3 Reading Comprehension (Leseverstehen) - q7 to q9
- * Max score: 9 (3 + 3 + 3)
+ * 2 Reading Comprehension (Leseverstehen) - q7 to q8
+ * Max score: 8 (3 + 3 + 2)
  * Aligned with Goethe-Zertifikat A1 (Start Deutsch 1) & ÖSD Zertifikat A1 standards.
  */
 
@@ -113,7 +113,7 @@ export const OBJECTIVE_QUESTIONS = [
   },
 
   // ==========================================
-  // SKILL 3: READING (Leseverstehen) - q7 to q9
+  // SKILL 3: READING (Leseverstehen) - q7 to q8
   // ==========================================
   {
     id: "q7",
@@ -148,23 +148,6 @@ export const OBJECTIVE_QUESTIONS = [
     ],
     correctOptionId: "B",
     explanation: "Stefan explicitly writes: 'Bitte bring etwas zu trinken mit' (Please bring something to drink). Food and music are already taken care of.",
-  },
-  {
-    id: "q9",
-    skill: "reading",
-    skillLabel: "Reading (Leseverstehen)",
-    topic: "Durchsage / Fahrplan (Transport Notice)",
-    instruction: "Read the public railway announcement at the station.",
-    passage: "Achtung Fahrgäste!\nDer ICE 582 nach Hamburg, planmäßige Abfahrt 14:15 Uhr von Gleis 4, fährt heute ausnahmsweise von Gleis 7 ab.\nGrund ist eine Weichenreparatur. Bitte Gleisänderung beachten!",
-    question: "Von welchem Gleis fährt der Zug nach Hamburg heute ab?",
-    options: [
-      { id: "A", text: "Von Gleis 4" },
-      { id: "B", text: "Von Gleis 7" },
-      { id: "C", text: "Der Zug fällt heute aus." },
-      { id: "D", text: "Von Gleis 14" },
-    ],
-    correctOptionId: "B",
-    explanation: "The notice states: 'fährt heute ausnahmsweise von Gleis 7 ab' (departs exceptionally from platform 7 today) due to repairs.",
   },
 ];
 

@@ -18,6 +18,7 @@ import {
   Printer,
   Gauge,
   Cpu,
+  Headphones,
 } from 'lucide-react';
 
 export default function ResultsPage() {
@@ -96,8 +97,9 @@ Classification: ${readinessCategory.label} - ${readinessCategory.headline}
 SKILL PERFORMANCE:
 - Vocabulary (Wortschatz): ${skills.vocabulary.correct} / 3.0 (${skills.vocabulary.percentage}%)
 - Grammar (Grammatik): ${skills.grammar.correct} / 3.0 (${skills.grammar.percentage}%)
-- Reading (Leseverstehen): ${skills.reading.correct} / 3.0 (${skills.reading.percentage}%)
-- Speaking (Sprechen): ${skills.speaking.correct} / 3.0 (${skills.speaking.percentage}%)
+- Reading (Leseverstehen): ${skills.reading.correct} / 2.0 (${skills.reading.percentage}%)
+- Listening (Hörverstehen): ${skills.listening.correct} / 2.0 (${skills.listening.percentage}%)
+- Speaking (Sprechen): ${skills.speaking.correct} / 2.0 (${skills.speaking.percentage}%)
 
 STRENGTHS:
 ${identifiedStrengths.map((s) => `• ${s.label}: ${s.score}`).join('\n') || 'None'}
@@ -148,7 +150,7 @@ ${readinessCategory.advice}
         {/* Top Header / Action Bar */}
         <div className="flex flex-wrap items-center justify-between gap-3">
           <span className="text-xs font-bold uppercase tracking-wider text-slate-500">
-            Diagnostic Report • 4-Skill Goethe & ÖSD A1 Readiness
+            Diagnostic Report • 5-Skill Goethe & ÖSD A1 Readiness
           </span>
 
           <div className="flex items-center gap-2">
@@ -276,7 +278,7 @@ ${readinessCategory.advice}
             <h2 className="text-xl font-bold text-slate-900">
               Skill-Wise Competency Breakdown
             </h2>
-            <span className="text-xs text-slate-500 font-medium">3 Points per Module</span>
+            <span className="text-xs text-slate-500 font-medium">Points per Module</span>
           </div>
           <SkillBreakdown skills={skills} />
         </div>
@@ -342,7 +344,7 @@ ${readinessCategory.advice}
             </div>
 
             <span className="text-sm font-extrabold px-3 py-1 rounded-full bg-rose-50 text-rose-800 border border-rose-200">
-              {skills.speaking.correct} / 3.0 Points
+              {skills.speaking.correct} / 2.0 Points
             </span>
           </div>
 

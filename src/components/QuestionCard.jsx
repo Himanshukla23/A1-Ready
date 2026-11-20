@@ -80,26 +80,23 @@ export default function QuestionCard({ question }) {
             <button
               key={option.id}
               onClick={() => selectAnswer(question.id, option.id)}
-              className={`w-full text-left p-4 rounded-xl border-2 transition-all flex items-center justify-between group ${
-                isSelected
+              className={`w-full text-left p-4 rounded-xl border-2 transition-all flex items-center justify-between group ${isSelected
                   ? 'border-sky-600 bg-sky-50/70 shadow-sm ring-1 ring-sky-500'
                   : 'border-slate-200 hover:border-slate-300 hover:bg-slate-50/60 bg-white'
-              }`}
+                }`}
             >
               <div className="flex items-center gap-3.5">
                 <span
-                  className={`w-8 h-8 rounded-lg font-bold text-sm flex items-center justify-center transition-colors ${
-                    isSelected
+                  className={`w-8 h-8 rounded-lg font-bold text-sm flex items-center justify-center transition-colors ${isSelected
                       ? 'bg-sky-600 text-white'
                       : 'bg-slate-100 text-slate-600 group-hover:bg-slate-200'
-                  }`}
+                    }`}
                 >
                   {option.id}
                 </span>
                 <span
-                  className={`text-sm sm:text-base font-medium ${
-                    isSelected ? 'text-sky-950 font-semibold' : 'text-slate-800'
-                  }`}
+                  className={`text-sm sm:text-base font-medium ${isSelected ? 'text-sky-950 font-semibold' : 'text-slate-800'
+                    }`}
                 >
                   {option.text}
                 </span>

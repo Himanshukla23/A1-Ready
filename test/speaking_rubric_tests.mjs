@@ -4,8 +4,8 @@ import { SPEAKING_QUESTIONS } from '../src/data/speakingQuestions.js';
 
 console.log('🧪 Starting Speaking Rubric & Voice Evaluation Unit Tests...\n');
 
-// 1. Verify 3 speaking tasks
-assert.equal(SPEAKING_QUESTIONS.length, 3, 'Must have exactly 3 speaking prompts');
+// 1. Verify 2 speaking tasks (part of the 12-task 5-skill exam)
+assert.equal(SPEAKING_QUESTIONS.length, 2, 'Must have exactly 2 speaking prompts');
 assert.equal(SPEAKING_DIMENSIONS.length, 4, 'Must have 4 evaluation dimensions');
 
 // 2. Test: High-quality A1 response for Prompt s1 (Self-Introduction)
@@ -25,7 +25,7 @@ assert.ok(resultS2.dimensions.task_relevance.score >= 2);
 console.log('✅ Test "Café ordering response (s2)" passed.');
 
 // 4. Test: Empty or silent response
-const emptyResult = evaluateSpeakingLocally('s3', '');
+const emptyResult = evaluateSpeakingLocally('s2', '');
 assert.equal(emptyResult.score, 0.0, 'Empty response must score 0.0');
 assert.equal(emptyResult.dimensions.task_relevance.score, 0);
 assert.equal(emptyResult.dimensions.completeness.score, 0);

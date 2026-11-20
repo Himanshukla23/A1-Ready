@@ -10,7 +10,7 @@ export function AssessmentProvider({ children }) {
   const [stage, setStage] = useState('landing');
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
 
-  // Objective answers: { q1: "A", q2: "B", ... }
+  // Objective + listening answers: { q1: "A", q2: "B", ..., l1: "B", l2: "B" }
   const [answers, setAnswers] = useState({});
 
   // Speaking responses: { s1: { transcript: "...", score: 2.5, evaluation: {...} } }
@@ -59,7 +59,7 @@ export function AssessmentProvider({ children }) {
   const submitAssessment = () => {
     // Ensure all submitted speaking tasks have evaluations computed
     const finalSpeakingResponses = { ...speakingResponses };
-    ['s1', 's2', 's3'].forEach((sId) => {
+    ['s1', 's2'].forEach((sId) => {
       const existing = finalSpeakingResponses[sId];
       if (existing && existing.transcript && typeof existing.score !== 'number') {
         const localEval = evaluateSpeakingLocally(sId, existing.transcript);

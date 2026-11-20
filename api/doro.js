@@ -8,8 +8,12 @@ function getKnowledgeContext(topicName = '') {
     const vocab = JSON.parse(fs.readFileSync(path.join(kbDir, 'vocabulary.json'), 'utf-8'));
     const grammar = JSON.parse(fs.readFileSync(path.join(kbDir, 'grammar.json'), 'utf-8'));
     const reading = JSON.parse(fs.readFileSync(path.join(kbDir, 'reading.json'), 'utf-8'));
+    let listening = null;
+    try {
+      listening = JSON.parse(fs.readFileSync(path.join(kbDir, 'listening.json'), 'utf-8'));
+    } catch (e) {}
 
-    return { vocab, grammar, reading };
+    return { vocab, grammar, reading, listening };
   } catch (err) {
     return null;
   }

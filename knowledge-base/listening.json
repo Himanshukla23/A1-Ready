@@ -1,0 +1,23 @@
+{
+  "skill": "listening",
+  "german_name": "Hörverstehen",
+  "level": "A1",
+  "exam_targets": ["Goethe-Zertifikat A1: Start Deutsch 1", "ÖSD Zertifikat A1"],
+  "topics": [
+    {
+      "topic": "Bahnhof & Durchsagen",
+      "keywords": ["Gleis", "Abfahrt", "Zug", "Uhr", "Verspätung", "Achtung"],
+      "tips": "Listen specifically for number words (z.B. fünfzehn Uhr dreißig = 15:30) and platform indicators (Gleis 3)."
+    },
+    {
+      "topic": "Telefon & Öffnungszeiten",
+      "keywords": ["Praxis", "geöffnet", "geschlossen", "Mittwochnachmittag", "Nachricht"],
+      "tips": "In automated phone messages, pay close attention to exceptions: 'Am Nachmittag geschlossen' or 'ab 14 Uhr'."
+    },
+    {
+      "topic": "Supermarkt & Preise",
+      "keywords": ["Sonderangebot", "Euro", "Cent", "Kasse", "heute"],
+      "tips": "Numbers and price formats: 'zwei Euro fünfzig' = 2,50€."
+    }
+  ]
+}

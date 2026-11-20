@@ -1,6 +1,6 @@
 /**
- * Version 2.0.0 Predefined Practice Recommendations Database
- * Covers Vocabulary, Grammar, Reading, and Speaking modules.
+ * Version 3.0.0 Predefined Practice Recommendations Database
+ * Covers Vocabulary, Grammar, Reading, Listening, and Speaking modules.
  */
 
 export const TOPIC_PRACTICE_DATABASE = {
@@ -65,29 +65,44 @@ export const TOPIC_PRACTICE_DATABASE = {
     practice_activity: "Scan short emails for the 4 core questions: Who is hosting? When? Where? What should guests bring? ('Bitte bring etwas zu trinken mit').",
     resources: "A1 Reading Part 1 (Letters & Emails)",
   },
-  "Durchsage / Fahrplan (Transport Notice)": {
-    topic: "Leseverstehen: Durchsagen & Gleisänderungen (Transit)",
-    skill: "reading",
-    reason: "Overlooked platform change exception notices ('fährt heute ausnahmsweise von Gleis 7 ab').",
-    practice_activity: "Distinguish between scheduled time ('planmäßig') and current exception ('heute ausnahmsweise').",
-    resources: "Railway Station Notices & Timetables",
+
+  // Listening Topics
+  "Ansage am Bahnhof (Train Station Announcement)": {
+    topic: "Hörverstehen: Bahnhofs-Ansagen (Transit Announcements)",
+    skill: "listening",
+    reason: "Difficulty extracting specific times and platform numbers from spoken German announcements.",
+    practice_activity: "Listen for key number words: 'fünfzehn' (15), 'dreißig' (30), 'Gleis drei' (platform 3). Practice German number listening drills from 1-100.",
+    resources: "German Numbers & Clock Time Audio Drills A1",
+  },
+  "Telefonanruf beim Arzt (Phone Call to Doctor)": {
+    topic: "Hörverstehen: Telefonansagen (Phone Messages)",
+    skill: "listening",
+    reason: "Missed specific day/time conditions in automated phone messages.",
+    practice_activity: "Practice listening for exception patterns: 'Am Mittwochnachmittag geschlossen' (closed Wednesday afternoon). Focus on day+time compounds in German.",
+    resources: "A1 Listening Practice: Automated Messages & Voicemail",
   },
 
   // Speaking Topics
   "speaking_weakness": {
     topic: "Sprechen: Mündliche Kommunikation (A1 Speaking)",
     skill: "speaking",
-    reason: "Hesitation in spoken self-introduction, ordering, or daily routine descriptions.",
-    practice_activity: "Practice the 3 parts of the Goethe/ÖSD speaking exam aloud: 1. Introduce yourself (Name, Land, Wohnort, Sprachen). 2. Order politely ('Ich möchte bitte einen Kaffee'). 3. Describe your weekend in 2 full sentences.",
+    reason: "Hesitation in spoken self-introduction or ordering.",
+    practice_activity: "Practice the 2 key A1 speaking parts aloud: 1. Introduce yourself (Name, Land, Wohnort, Sprachen). 2. Order politely ('Ich möchte bitte einen Kaffee').",
     resources: "Offizielle Redemittel für die A1 Sprechprüfung (Goethe & ÖSD)",
+  },
+
+  // Listening Weakness (general)
+  "listening_weakness": {
+    topic: "Hörverstehen: Allgemeines Hörverständnis (General Listening)",
+    skill: "listening",
+    reason: "Difficulty understanding spoken German at natural pace.",
+    practice_activity: "Listen to Deutsche Welle 'Nicos Weg' A1 episodes with subtitles. Practice number dictation drills and time expressions.",
+    resources: "DW Nicos Weg A1 Listening + Goethe Hören Modellsatz",
   },
 };
 
 /**
- * Generate a personalized 4-skill study plan based on incorrect questions and speaking evaluation.
- *
- * @param {object} results - Output from calculateAssessmentScore
- * @returns {Array} List of curated recommendation items
+ * Generate a personalized 5-skill study plan based on results.
  */
 export function generateRecommendations(results) {
   if (!results) return [];
@@ -113,8 +128,8 @@ export function generateRecommendations(results) {
     });
   }
 
-  // 2. Add speaking recommendation if speaking score is below 2.5 / 3
-  if (results.skills?.speaking?.correct < 2.5) {
+  // 2. Add speaking recommendation if speaking score is low
+  if (results.skills?.speaking?.percentage < 75) {
     const spEntry = TOPIC_PRACTICE_DATABASE["speaking_weakness"];
     if (spEntry && !processedTopics.has("speaking_weakness")) {
       processedTopics.add("speaking_weakness");
@@ -124,23 +139,37 @@ export function generateRecommendations(results) {
         reason: "Your speaking score indicates you would benefit from vocal practice drills before the oral exam.",
         practice_activity: spEntry.practice_activity,
         resources: spEntry.resources,
-        priority: results.skills.speaking.correct < 1.5 ? "high" : "medium",
+        priority: results.skills.speaking.percentage < 50 ? "high" : "medium",
       });
     }
   }
 
-  // 3. If learner scored very high, provide advanced full-length simulation advice
+  // 3. Add listening recommendation if listening score is low
+  if (results.skills?.listening?.percentage < 75) {
+    const lEntry = TOPIC_PRACTICE_DATABASE["listening_weakness"];
+    if (lEntry && !processedTopics.has("listening_weakness")) {
+      processedTopics.add("listening_weakness");
+      recommendations.push({
+        topic: lEntry.topic,
+        skill: lEntry.skill,
+        reason: "Your listening comprehension needs strengthening for the Hören section of the exam.",
+        practice_activity: lEntry.practice_activity,
+        resources: lEntry.resources,
+        priority: results.skills.listening.percentage < 50 ? "high" : "medium",
+      });
+    }
+  }
+
+  // 4. Perfect score path
   if (recommendations.length === 0) {
-    recommendations.push(
-      {
-        topic: "Exam Simulation: Full Goethe & ÖSD Sample Papers",
-        skill: "all",
-        reason: "Outstanding performance across Vocabulary, Grammar, Reading, and Speaking!",
-        practice_activity: "Take official full-length sample papers under real exam time limits (Lesen 25 min, Schreiben 20 min, Sprechen 15 min).",
-        resources: "Official Goethe / ÖSD Modellsatz 01 & 02",
-        priority: "medium",
-      }
-    );
+    recommendations.push({
+      topic: "Exam Simulation: Full Goethe & ÖSD Sample Papers",
+      skill: "all",
+      reason: "Outstanding performance across all 5 skills!",
+      practice_activity: "Take official full-length sample papers under real exam time limits (Lesen 25 min, Hören 20 min, Schreiben 20 min, Sprechen 15 min).",
+      resources: "Official Goethe / ÖSD Modellsatz 01 & 02",
+      priority: "medium",
+    });
   }
 
   return recommendations;

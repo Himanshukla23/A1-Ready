@@ -1,8 +1,11 @@
 import { OBJECTIVE_QUESTIONS } from '../data/questions.js';
+import { LISTENING_QUESTIONS } from '../data/listeningQuestions.js';
 import { SPEAKING_QUESTIONS } from '../data/speakingQuestions.js';
 
+// Order: Vocabulary (3) → Grammar (3) → Reading (2) → Listening (2) → Speaking (2) = 12
 export const ALL_ASSESSMENT_TASKS = [
   ...OBJECTIVE_QUESTIONS,
+  ...LISTENING_QUESTIONS,
   ...SPEAKING_QUESTIONS,
 ];
 
