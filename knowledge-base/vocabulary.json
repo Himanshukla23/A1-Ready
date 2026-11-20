@@ -1,0 +1,50 @@
+{
+  "category": "A1 Vocabulary (Wortschatz)",
+  "level": "CEFR A1",
+  "topics": [
+    {
+      "id": "food_and_drinks",
+      "name": "Essen & Trinken (Food & Drinks)",
+      "keywords": ["Kaffee", "Tee", "Wasser", "Brot", "Käse", "Apfel", "Frühstück", "trinken", "essen"],
+      "core_concepts": [
+        "Nouns take grammatical genders: der Kaffee (masc.), der Tee (masc.), das Wasser (neut.), das Brot (neut.), der Käse (masc.), der Apfel (masc.).",
+        "Common verbs: essen (du isst, er isst), trinken (ich trinke, er trinkt).",
+        "Typical phrases: 'Am Morgen trinke ich gern einen Kaffee mit Milch und Zucker.' / 'Zum Frühstück esse ich Brot mit Käse.'"
+      ],
+      "sample_dialogue": "A: Was möchten Sie trinken? B: Einen Kaffee bitte, mit Milch."
+    },
+    {
+      "id": "daily_routine_and_time",
+      "name": "Uhrzeit & Tagesablauf (Daily Routine & Time)",
+      "keywords": ["Uhr", "beginnen", "aufhören", "aufstehen", "anfangen", "morgens", "abends", "Frühstück"],
+      "core_concepts": [
+        "Separable verbs: aufstehen (er steht auf), aufhören (der Kurs hört um 12:30 auf), anfangen (er fängt an).",
+        "Time prepositions: 'um' for clock time ('um 9:00 Uhr'), 'am' for days ('am Montag', 'am Wochenende'), 'von... bis...' for durations.",
+        "Sentence structure: In German, the conjugated verb is always in position 2 ('Um 9:00 Uhr beginnt der Kurs')."
+      ],
+      "sample_dialogue": "A: Um wie viel Uhr fängt der Film an? B: Um 20:15 Uhr."
+    },
+    {
+      "id": "transportation_and_city",
+      "name": "Verkehr & Stadt (Transportation & City)",
+      "keywords": ["Bahnhof", "Flughafen", "Zug", "Gleis", "Bus", "Haltestelle", "Ticket", "Fahrkarte"],
+      "core_concepts": [
+        "City locations: der Bahnhof (train station), der Flughafen (airport), die Haltestelle (bus/tram stop), das Krankenhaus (hospital).",
+        "Means of transport: 'mit dem Zug' (masc.), 'mit dem Bus' (masc.), 'mit der U-Bahn' (fem.), 'mit dem Auto' (neut.).",
+        "Asking for directions: 'Entschuldigung, wie komme ich zum Bahnhof / zur Haltestelle?'"
+      ],
+      "sample_dialogue": "A: Entschuldigung, wo ist der Bahnhof? B: Gehen Sie geradeaus und dann links."
+    },
+    {
+      "id": "family_and_people",
+      "name": "Familie & Personen (Family & People)",
+      "keywords": ["Mutter", "Vater", "Schwester", "Bruder", "Tante", "Onkel", "Cousine", "Großeltern"],
+      "core_concepts": [
+        "Family relations: die Schwester von meiner Mutter = meine Tante. Der Bruder von meinem Vater = mein Onkel.",
+        "Possessive articles: mein/meine, dein/deine, sein/seine, ihr/ihre.",
+        "Describing family members: 'Meine Tante wohnt in Berlin und arbeitet als Ärztin.'"
+      ],
+      "sample_dialogue": "A: Wer ist das auf dem Foto? B: Das ist meine Schwester Julia."
+    }
+  ]
+}

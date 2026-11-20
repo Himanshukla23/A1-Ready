@@ -1,0 +1,58 @@
+{
+  "category": "A1 Reading Comprehension (Leseverstehen)",
+  "level": "CEFR A1",
+  "text_types": [
+    {
+      "id": "public_notices_and_hours",
+      "name": "Öffentliche Hinweisschilder & Öffnungszeiten",
+      "description": "Signs at shops, doctor's offices, banks, and bakeries specifying operating hours.",
+      "key_phrases": [
+        "Montag bis Freitag: 08:00 – 18:00 Uhr (Mo-Fr)",
+        "Werktags: Monday to Saturday",
+        "Geschlossen: Closed",
+        "Geöffnet von ... bis ...: Open from ... to ...",
+        "Sonn- und Feiertage: Sundays and public holidays"
+      ],
+      "exam_tip": "Carefully check the specific day mentioned in the question (e.g. Samstag) against the notice's day brackets."
+    },
+    {
+      "id": "personal_emails_and_invitations",
+      "name": "Private E-Mails, SMS & Einladungen",
+      "description": "Short correspondence about parties, meetings, holidays, or daily updates.",
+      "key_phrases": [
+        "Ich lade dich herzlich zu ... ein",
+        "Die Party beginnt um ... Uhr",
+        "Bitte bring etwas zu essen/trinken mit",
+        "Sag mir bitte bis Freitag Bescheid",
+        "Viele Grüße / Liebe Grüße"
+      ],
+      "exam_tip": "Identify the 4 key facts: Host (Wer?), Date/Time (Wann?), Location (Wo?), and Task/Items (Was mitbringen?)."
+    },
+    {
+      "id": "classified_ads",
+      "name": "Kleinanzeigen & Wohnungsangebote",
+      "description": "Short ads for apartments, jobs, or items for sale with common abbreviations.",
+      "key_abbreviations": [
+        "2-Zi.-Whg. = 2-Zimmer-Wohnung",
+        "KM = Kaltmiete (rent without utilities)",
+        "NK = Nebenkosten (utilities)",
+        "ab 1. Mai frei = available from May 1st",
+        "Keine Haustiere = No pets allowed"
+      ],
+      "exam_tip": "Beware of negative constraints like 'Keine Haustiere' or 'Nichtraucher'."
+    },
+    {
+      "id": "transport_announcements",
+      "name": "Fahrpläne, Bahnhofs- & Flughafenanzeigen",
+      "description": "Notices regarding platform changes, delays, cancellations, and route updates.",
+      "key_phrases": [
+        "Gleis / Gleisänderung: Platform / platform change",
+        "fährt heute ausnahmsweise von Gleis 7 ab: departs exceptionally from platform 7 today",
+        "Verspätung ca. ... Minuten: delayed by ... minutes",
+        "Zug fällt aus: train is canceled",
+        "Grund ist eine Reparatur / Störung: reason is a repair / disruption"
+      ],
+      "exam_tip": "Distinguish between scheduled plan (planmäßig) and current exception (heute ausnahmsweise)."
+    }
+  ]
+}

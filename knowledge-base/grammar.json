@@ -1,0 +1,72 @@
+{
+  "category": "A1 Grammar (Grammatik)",
+  "level": "CEFR A1",
+  "rules": [
+    {
+      "id": "accusative_case",
+      "name": "Bestimmte & Unbestimmte Artikel im Akkusativ",
+      "summary": "In the accusative case (direct object), only masculine articles change. Feminine, neuter, and plural remain unchanged.",
+      "chart": {
+        "masculine": { "nominative": "der / ein", "accusative": "den / einen", "example": "Herr Müller kauft einen neuen Tisch." },
+        "feminine": { "nominative": "die / eine", "accusative": "die / eine", "example": "Ich trinke eine Limonade." },
+        "neuter": { "nominative": "das / ein", "accusative": "das / ein", "example": "Er liest ein Buch." },
+        "plural": { "nominative": "die / -", "accusative": "die / -", "example": "Wir kaufen Äpfel." }
+      },
+      "common_accusative_verbs": ["haben", "brauchen", "kaufen", "trinken", "essen", "sehen", "finden", "suchen"]
+    },
+    {
+      "id": "irregular_verbs_present",
+      "name": "Unregelmäßige Verben mit Vokalwechsel (Präsens)",
+      "summary": "Certain strong verbs change their stem vowel only in the 2nd (du) and 3rd person singular (er/sie/es).",
+      "patterns": [
+        {
+          "change": "a -> ä",
+          "examples": [
+            "fahren: ich fahre, du fährst, er fährt, wir fahren",
+            "schlafen: ich schlafe, du schläfst, er schläft",
+            "waschen: ich wasche, du wäschst, er wäscht"
+          ]
+        },
+        {
+          "change": "e -> i / ie",
+          "examples": [
+            "sprechen: ich spreche, du sprichst, er spricht",
+            "lesen: ich lese, du liest, er liest",
+            "sehen: ich sehe, du siehst, er sieht"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "modal_verbs",
+      "name": "Modalverben (können, müssen, möchten)",
+      "summary": "Modal verbs express ability, obligation, or wish. In the present tense, 1st and 3rd person singular forms are identical and have no ending.",
+      "conjugation_koennen": {
+        "ich": "kann",
+        "du": "kannst",
+        "er_sie_es": "kann",
+        "wir": "können",
+        "ihr": "könnt",
+        "sie_Sie": "können"
+      },
+      "sentence_bracket": "The modal verb stands in position 2, and the second infinitive verb goes to the very end of the sentence: 'Anna kann heute leider nicht zur Arbeit kommen.'"
+    },
+    {
+      "id": "local_prepositions",
+      "name": "Feste lokale Wendungen: 'zu Hause' vs 'nach Hause'",
+      "summary": "Distinguish between location (stationary: where?) and destination (movement: where to?).",
+      "rules": [
+        {
+          "question": "Wo? (Where?)",
+          "expression": "zu Hause",
+          "example": "Lisa ist gerade zu Hause."
+        },
+        {
+          "question": "Wohin? (Where to?)",
+          "expression": "nach Hause",
+          "example": "Ich bin müde und gehe jetzt nach Hause."
+        }
+      ]
+    }
+  ]
+}
