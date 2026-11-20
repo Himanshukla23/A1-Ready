@@ -3,6 +3,7 @@ import { useAssessment } from '../context/AssessmentContext';
 import SkillBreakdown from '../components/SkillBreakdown';
 import RecommendationCard from '../components/RecommendationCard';
 import { generateRecommendations } from '../utils/recommendations.js';
+import { SPEAKING_QUESTIONS } from '../data/speakingQuestions.js';
 import {
   RotateCcw,
   Sparkles,
@@ -11,17 +12,19 @@ import {
   AlertTriangle,
   ChevronDown,
   ChevronUp,
+  Mic,
+  Volume2,
 } from 'lucide-react';
 
 export default function ResultsPage() {
-  const { results, retakeAssessment, goToLanding, toggleDoro } = useAssessment();
+  const { results, retakeAssessment, goToLanding, toggleDoro, speakingResponses } = useAssessment();
   const [expandedQuestionId, setExpandedQuestionId] = useState(null);
 
   if (!results) {
     return (
       <div className="max-w-2xl mx-auto px-4 py-20 text-center">
         <h2 className="text-xl font-bold text-slate-800">No Assessment Results Found</h2>
-        <p className="mt-2 text-slate-500">Please complete the 12-question diagnostic first.</p>
+        <p className="mt-2 text-slate-500">Please complete the 12-task diagnostic first.</p>
         <button
           onClick={goToLanding}
           className="mt-6 px-6 py-2.5 bg-sky-600 text-white rounded-xl font-semibold hover:bg-sky-700"
@@ -33,13 +36,14 @@ export default function ResultsPage() {
   }
 
   const {
-    totalQuestions,
+    totalPoints,
     correctCount,
     percentage,
     skills,
     readinessCategory,
     identifiedStrengths,
     identifiedWeaknesses,
+    criticalSkillGaps,
     incorrectQuestions,
   } = results;
 
@@ -85,7 +89,7 @@ export default function ResultsPage() {
         {/* Top Header / Action Bar */}
         <div className="flex items-center justify-between">
           <span className="text-xs font-bold uppercase tracking-wider text-slate-500">
-            Diagnostic Report • Goethe & ÖSD A1 Exam Readiness
+            Diagnostic Report • 4-Skill Goethe & ÖSD A1 Readiness
           </span>
 
           <div className="flex items-center gap-2">
@@ -128,27 +132,27 @@ export default function ResultsPage() {
               </div>
             </div>
 
-            {/* Score Ring / Pill */}
-            <div className="bg-white rounded-2xl border border-slate-200/80 p-6 flex flex-col items-center justify-center text-center shadow-xs shrink-0 self-start md:self-center min-w-[180px]">
-              <span className="text-xs font-bold text-slate-400 uppercase tracking-wider">Total Score</span>
+            {/* Score Pill */}
+            <div className="bg-white rounded-2xl border border-slate-200/80 p-6 flex flex-col items-center justify-center text-center shadow-xs shrink-0 self-start md:self-center min-w-[190px]">
+              <span className="text-xs font-bold text-slate-400 uppercase tracking-wider">Overall Score</span>
               <div className="text-4xl sm:text-5xl font-black text-slate-900 mt-1">
                 {correctCount}
-                <span className="text-xl text-slate-400 font-bold"> / {totalQuestions}</span>
+                <span className="text-xl text-slate-400 font-bold"> / {totalPoints}</span>
               </div>
               <div className="mt-2 inline-flex items-center px-3 py-1 rounded-full text-xs font-bold bg-slate-100 text-slate-800">
-                {percentage}% Accuracy
+                {percentage}% Readiness
               </div>
             </div>
           </div>
         </div>
 
-        {/* Skill-wise Performance Breakdown */}
+        {/* 4 Skill-wise Performance Breakdown */}
         <div>
           <div className="flex items-center justify-between mb-4">
             <h2 className="text-xl font-bold text-slate-900">
               Skill-Wise Competency Breakdown
             </h2>
-            <span className="text-xs text-slate-500 font-medium">4 Questions per Module</span>
+            <span className="text-xs text-slate-500 font-medium">3 Points per Module</span>
           </div>
           <SkillBreakdown skills={skills} />
         </div>
@@ -166,12 +170,12 @@ export default function ResultsPage() {
                 {identifiedStrengths.map((item) => (
                   <li key={item.skill} className="flex items-center justify-between text-xs sm:text-sm p-2 rounded-lg bg-emerald-50/60 border border-emerald-200/60">
                     <span className="font-medium text-slate-800">{item.label}</span>
-                    <span className="font-bold text-emerald-700">{item.score} correct</span>
+                    <span className="font-bold text-emerald-700">{item.score} ({item.percentage}%)</span>
                   </li>
                 ))}
               </ul>
             ) : (
-              <p className="text-xs text-slate-500 italic">No modules scored $\ge 3/4$ yet.</p>
+              <p className="text-xs text-slate-500 italic">No modules scored $\ge 75\%$ yet.</p>
             )}
           </div>
 
@@ -186,30 +190,106 @@ export default function ResultsPage() {
                 {identifiedWeaknesses.map((item) => (
                   <li key={item.skill} className="flex items-center justify-between text-xs sm:text-sm p-2 rounded-lg bg-rose-50/60 border border-rose-200/60">
                     <span className="font-medium text-slate-800">{item.label}</span>
-                    <span className="font-bold text-rose-700">{item.score} correct</span>
+                    <span className="font-bold text-rose-700">{item.score} ({item.percentage}%)</span>
                   </li>
                 ))}
               </ul>
             ) : (
-              <p className="text-xs text-emerald-600 font-medium">Congratulations! All modules achieved $\ge 3/4$ correct.</p>
+              <p className="text-xs text-emerald-600 font-medium">Congratulations! All modules achieved solid performance.</p>
             )}
           </div>
         </div>
 
-        {/* Detailed Mistake Review */}
+        {/* Speaking Assessment Performance Review */}
+        <div className="bg-white rounded-3xl border border-slate-200 p-6 sm:p-8 shadow-xs space-y-6">
+          <div className="flex items-center justify-between border-b border-slate-100 pb-4">
+            <div className="flex items-center gap-3">
+              <div className="w-10 h-10 rounded-xl bg-rose-100 text-rose-700 flex items-center justify-center font-bold">
+                <Mic className="w-5 h-5" />
+              </div>
+              <div>
+                <h2 className="text-xl font-bold text-slate-900">
+                  Speaking Assessment Review (Sprechen)
+                </h2>
+                <p className="text-xs sm:text-sm text-slate-500">
+                  Evaluated across 4 dimensions: Task Relevance, Grammar, Vocabulary, and Completeness.
+                </p>
+              </div>
+            </div>
+
+            <span className="text-sm font-extrabold px-3 py-1 rounded-full bg-rose-50 text-rose-800 border border-rose-200">
+              {skills.speaking.correct} / 3.0 Points
+            </span>
+          </div>
+
+          <div className="space-y-4">
+            {SPEAKING_QUESTIONS.map((sp) => {
+              const resp = speakingResponses[sp.id];
+              const evalData = resp?.evaluation;
+
+              return (
+                <div key={sp.id} className="p-4 rounded-2xl border border-slate-200 bg-slate-50/60 space-y-3">
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <span className="text-xs font-bold uppercase tracking-wider text-slate-500">{sp.part}</span>
+                      <h4 className="text-sm font-bold text-slate-900">{sp.topic}</h4>
+                    </div>
+                    {evalData && (
+                      <span className="text-xs font-bold px-2.5 py-0.5 rounded-full bg-white border border-slate-300 text-slate-800">
+                        {evalData.score} / 3.0 pts
+                      </span>
+                    )}
+                  </div>
+
+                  <p className="text-xs text-slate-600 italic">
+                    Prompt: "{sp.promptGerman}"
+                  </p>
+
+                  <div className="bg-white p-3 rounded-xl border border-slate-200 text-xs sm:text-sm">
+                    <span className="text-[11px] font-bold text-slate-400 uppercase tracking-wider block mb-1">
+                      Your Transcribed Response:
+                    </span>
+                    <p className="font-medium text-slate-800">
+                      "{resp?.transcript || '(No speech recorded)'}"
+                    </p>
+                  </div>
+
+                  {evalData?.dimensions && (
+                    <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 text-center text-xs">
+                      {Object.entries(evalData.dimensions).map(([dimKey, dim]) => (
+                        <div key={dimKey} className="bg-white p-2 rounded-lg border border-slate-200">
+                          <span className="text-[10px] text-slate-400 font-bold uppercase block">{dimKey.replace('_', ' ')}</span>
+                          <span className="font-extrabold text-slate-900">{dim.score} / 3</span>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+
+                  {evalData?.improvements?.length > 0 && (
+                    <p className="text-xs text-amber-800 bg-amber-50 p-2 rounded-lg border border-amber-200">
+                      <strong>Tip: </strong> {evalData.improvements.join(' ')}
+                    </p>
+                  )}
+                </div>
+              );
+            })}
+          </div>
+        </div>
+
+        {/* Detailed Mistake Review for Objective Questions */}
         <div className="bg-white rounded-3xl border border-slate-200 p-6 sm:p-8 shadow-xs">
           <div className="flex flex-wrap items-center justify-between gap-2 border-b border-slate-100 pb-4 mb-6">
             <div>
               <h2 className="text-xl font-bold text-slate-900">
-                Detailed Mistake Analysis ({incorrectQuestions.length} Questions)
+                Objective Mistakes Analysis ({incorrectQuestions.length} Questions)
               </h2>
               <p className="text-xs sm:text-sm text-slate-500 mt-0.5">
-                Understand exactly why your selected answer was wrong and review the underlying CEFR A1 grammar and vocabulary rules.
+                Review why your chosen answer was wrong and understand the CEFR A1 rule.
               </p>
             </div>
             {incorrectQuestions.length === 0 && (
               <span className="text-xs font-bold text-emerald-700 bg-emerald-50 px-3 py-1 rounded-full border border-emerald-200">
-                100% Correct!
+                100% Correct in MCQs!
               </span>
             )}
           </div>
@@ -217,8 +297,8 @@ export default function ResultsPage() {
           {incorrectQuestions.length === 0 ? (
             <div className="text-center py-8 text-slate-500">
               <CheckCircle2 className="w-12 h-12 text-emerald-500 mx-auto mb-2" />
-              <p className="font-bold text-slate-800">Perfect Score!</p>
-              <p className="text-xs text-slate-500">You answered all 12 questions correctly.</p>
+              <p className="font-bold text-slate-800">Flawless Objective Performance!</p>
+              <p className="text-xs text-slate-500">You answered all 9 multiple-choice questions correctly.</p>
             </div>
           ) : (
             <div className="space-y-4">
@@ -264,7 +344,6 @@ export default function ResultsPage() {
 
                     {isExpanded && (
                       <div className="p-4 sm:p-5 border-t border-slate-200 bg-white space-y-4 animate-in fade-in">
-                        {/* Reading passage if applicable */}
                         {q.passage && (
                           <div className="p-3.5 rounded-xl bg-amber-50/50 border border-amber-200/60 text-xs sm:text-sm text-slate-800 whitespace-pre-line">
                             <strong className="text-amber-900 block mb-1">Passage / Notice:</strong>
@@ -272,12 +351,10 @@ export default function ResultsPage() {
                           </div>
                         )}
 
-                        {/* Question prompt */}
                         <div className="text-sm font-semibold text-slate-900">
                           {q.question}
                         </div>
 
-                        {/* Answer comparison */}
                         <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs sm:text-sm">
                           <div className="p-3 rounded-xl bg-rose-50 border border-rose-200 text-rose-900">
                             <span className="text-xs font-bold uppercase tracking-wider block text-rose-700">Your Selection:</span>
@@ -289,13 +366,11 @@ export default function ResultsPage() {
                           </div>
                         </div>
 
-                        {/* Explanation */}
                         <div className="p-4 rounded-xl bg-slate-50 border border-slate-200 text-xs sm:text-sm text-slate-700">
                           <strong className="text-slate-900 block mb-1">💡 Explanation & Exam Rule:</strong>
                           <p className="leading-relaxed">{q.explanation}</p>
                         </div>
 
-                        {/* Doro Context Trigger */}
                         <div className="flex justify-end">
                           <button
                             onClick={toggleDoro}
@@ -319,10 +394,10 @@ export default function ResultsPage() {
           <div className="flex items-center justify-between mb-4">
             <div>
               <h2 className="text-xl font-bold text-slate-900">
-                Your Personalized A1 Study Plan
+                Your Personalized 4-Skill Study Plan
               </h2>
               <p className="text-xs sm:text-sm text-slate-500 mt-0.5">
-                Targeted exercises and drills based on your diagnostic results:
+                Targeted drills based on your diagnostic results:
               </p>
             </div>
           </div>
@@ -339,13 +414,13 @@ export default function ResultsPage() {
           <div>
             <div className="flex items-center gap-2 text-amber-200 text-xs font-bold uppercase tracking-wider mb-1">
               <Sparkles className="w-4 h-4" />
-              <span>Interactive Review Session</span>
+              <span>Voice & Text Tutoring</span>
             </div>
             <h3 className="text-2xl font-black">
-              Want to practice these mistakes with Doro AI?
+              Want to practice speaking and grammar with Doro?
             </h3>
             <p className="mt-1 text-amber-100 text-xs sm:text-sm max-w-xl">
-              Doro can generate similar practice questions, drill accusative endings, or explain reading strategies.
+              Doro can listen to your German voice answers, read German phrases aloud, and drill accusative endings.
             </p>
           </div>
 
@@ -364,7 +439,7 @@ export default function ResultsPage() {
             className="inline-flex items-center gap-2 px-6 py-3.5 rounded-xl font-bold text-sm bg-sky-600 hover:bg-sky-700 text-white shadow-md shadow-sky-600/20 transition"
           >
             <RotateCcw className="w-4 h-4" />
-            <span>Retake Diagnostic Assessment</span>
+            <span>Retake 4-Skill Diagnostic</span>
           </button>
 
           <button

@@ -1,5 +1,5 @@
 import React from 'react';
-import { BookOpen, Layers, Compass } from 'lucide-react';
+import { BookOpen, Layers, Compass, Mic } from 'lucide-react';
 
 export default function SkillBreakdown({ skills }) {
   if (!skills) return null;
@@ -26,17 +26,25 @@ export default function SkillBreakdown({ skills }) {
       icon: Compass,
       color: 'emerald',
     },
+    {
+      key: 'speaking',
+      title: 'Speaking (Sprechen)',
+      data: skills.speaking,
+      icon: Mic,
+      color: 'rose',
+    },
   ];
 
   const getStatusBadge = (correct, total) => {
-    if (correct >= 3) {
+    const ratio = correct / total;
+    if (ratio >= 0.8) {
       return {
         label: 'Exam-Ready',
         badge: 'bg-emerald-50 text-emerald-700 border-emerald-200',
         barColor: 'bg-emerald-500',
       };
     }
-    if (correct === 2) {
+    if (ratio >= 0.5) {
       return {
         label: 'Needs Review',
         badge: 'bg-amber-50 text-amber-700 border-amber-200',
@@ -51,7 +59,7 @@ export default function SkillBreakdown({ skills }) {
   };
 
   return (
-    <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
       {skillConfig.map((item) => {
         const { title, data, icon: Icon } = item;
         const status = getStatusBadge(data.correct, data.total);
@@ -67,15 +75,15 @@ export default function SkillBreakdown({ skills }) {
                   <div className="w-8 h-8 rounded-lg bg-slate-100 flex items-center justify-center text-slate-700">
                     <Icon className="w-4 h-4" />
                   </div>
-                  <h4 className="text-sm font-bold text-slate-900">{title}</h4>
+                  <h4 className="text-xs font-bold text-slate-900 leading-snug">{title}</h4>
                 </div>
               </div>
 
               <div className="flex items-baseline justify-between mt-2">
                 <span className="text-3xl font-extrabold text-slate-900">
-                  {data.correct} <span className="text-base text-slate-400 font-semibold">/ {data.total}</span>
+                  {data.correct} <span className="text-sm text-slate-400 font-semibold">/ {data.total}</span>
                 </span>
-                <span className={`text-xs font-bold px-2.5 py-0.5 rounded-full border ${status.badge}`}>
+                <span className={`text-[11px] font-bold px-2 py-0.5 rounded-full border ${status.badge}`}>
                   {status.label}
                 </span>
               </div>
@@ -90,7 +98,7 @@ export default function SkillBreakdown({ skills }) {
             </div>
 
             <p className="mt-4 text-xs text-slate-500 font-medium">
-              {data.percentage}% correct answers in this module
+              {data.percentage}% proficiency in this module
             </p>
           </div>
         );

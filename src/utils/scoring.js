@@ -1,41 +1,36 @@
-import { QUESTIONS } from '../data/questions.js';
+import { OBJECTIVE_QUESTIONS } from '../data/questions.js';
+import { SPEAKING_QUESTIONS } from '../data/speakingQuestions.js';
 
 /**
- * Deterministic scoring engine for the 12-question A1 ReadyCheck diagnostic assessment.
- * Evaluates answers against pre-defined answer keys without LLM involvement.
+ * Version 2.0.0 Scoring Engine (4 Skills: Vocab, Grammar, Reading, Speaking)
+ * Total Score: 12.0 (3.0 per skill)
  *
- * @param {Record<string, string>} userAnswers - e.g., { q1: "A", q2: "B", ... }
- * @returns {object} Full evaluated score report
+ * @param {Record<string, string>} objectiveAnswers - e.g., { q1: "A", q2: "B", ... }
+ * @param {Record<string, object>} speakingEvaluations - e.g., { s1: { score: 2.5, ... }, ... }
+ * @returns {object} Full four-skill diagnostic score report
  */
-export function calculateAssessmentScore(userAnswers = {}) {
-  const totalQuestions = QUESTIONS.length; // 12
-  let correctCount = 0;
-
+export function calculateAssessmentScore(objectiveAnswers = {}, speakingEvaluations = {}) {
+  // 1. Evaluate Objective Questions (Vocab, Grammar, Reading)
   const skills = {
-    vocabulary: { correct: 0, total: 0, percentage: 0, label: "Wortschatz (Vocabulary)" },
-    grammar: { correct: 0, total: 0, percentage: 0, label: "Grammatik (Grammar)" },
-    reading: { correct: 0, total: 0, percentage: 0, label: "Leseverstehen (Reading)" },
+    vocabulary: { correct: 0, total: 3, percentage: 0, label: "Vocabulary (Wortschatz)" },
+    grammar: { correct: 0, total: 3, percentage: 0, label: "Grammar (Grammatik)" },
+    reading: { correct: 0, total: 3, percentage: 0, label: "Reading (Leseverstehen)" },
+    speaking: { correct: 0, total: 3, percentage: 0, label: "Speaking (Sprechen)" },
   };
 
   const incorrectQuestions = [];
   const correctQuestions = [];
 
-  QUESTIONS.forEach((q) => {
-    const skillKey = q.skill;
-    if (skills[skillKey]) {
-      skills[skillKey].total += 1;
-    }
-
-    const selectedOptionId = userAnswers[q.id];
+  OBJECTIVE_QUESTIONS.forEach((q) => {
+    const selectedOptionId = objectiveAnswers[q.id];
     const isCorrect = selectedOptionId === q.correctOptionId;
 
     const selectedOptionObj = q.options.find((opt) => opt.id === selectedOptionId);
     const correctOptionObj = q.options.find((opt) => opt.id === q.correctOptionId);
 
     if (isCorrect) {
-      correctCount += 1;
-      if (skills[skillKey]) {
-        skills[skillKey].correct += 1;
+      if (skills[q.skill]) {
+        skills[q.skill].correct += 1;
       }
       correctQuestions.push({
         id: q.id,
@@ -52,7 +47,7 @@ export function calculateAssessmentScore(userAnswers = {}) {
         question: q.question,
         passage: q.passage || null,
         selectedOptionId: selectedOptionId || "Unanswered",
-        selectedOptionText: selectedOptionObj ? selectedOptionObj.text : "Keine Antwort",
+        selectedOptionText: selectedOptionObj ? selectedOptionObj.text : "No answer",
         correctOptionId: q.correctOptionId,
         correctOptionText: correctOptionObj ? correctOptionObj.text : "",
         explanation: q.explanation,
@@ -60,79 +55,112 @@ export function calculateAssessmentScore(userAnswers = {}) {
     }
   });
 
-  // Calculate percentages
-  const overallPercentage = Math.round((correctCount / totalQuestions) * 100);
-  Object.keys(skills).forEach((key) => {
-    const s = skills[key];
-    s.percentage = s.total > 0 ? Math.round((s.correct / s.total) * 100) : 0;
+  // 2. Evaluate Speaking Questions (Average of 3 speaking tasks, each 0 to 3)
+  const speakingPromptScores = [];
+  SPEAKING_QUESTIONS.forEach((sp) => {
+    const evalData = speakingEvaluations[sp.id];
+    const promptScore = evalData && typeof evalData.score === 'number' ? evalData.score : 0;
+    speakingPromptScores.push(promptScore);
   });
 
-  // Strengths and Weaknesses identification
+  const rawSpeakingAverage =
+    speakingPromptScores.reduce((acc, curr) => acc + curr, 0) / SPEAKING_QUESTIONS.length;
+  // Normalized speaking score out of 3.0
+  const normalizedSpeakingScore = Math.round(rawSpeakingAverage * 10) / 10;
+  skills.speaking.correct = normalizedSpeakingScore;
+
+  // Calculate skill percentages
+  Object.keys(skills).forEach((key) => {
+    const s = skills[key];
+    s.percentage = Math.round((s.correct / s.total) * 100);
+  });
+
+  // Total Combined Score (out of 12.0)
+  const totalCorrectPoints =
+    skills.vocabulary.correct +
+    skills.grammar.correct +
+    skills.reading.correct +
+    skills.speaking.correct;
+
+  const roundedTotalPoints = Math.round(totalCorrectPoints * 10) / 10;
+  const overallPercentage = Math.round((totalCorrectPoints / 12) * 100);
+
+  // Identify Strengths (>= 2.5 / 3 or >= 80%) & Weaknesses (< 1.5 / 3 or < 50%)
   const identifiedStrengths = [];
   const identifiedWeaknesses = [];
+  const criticalSkillGaps = []; // Skills strictly below 50%
 
   Object.entries(skills).forEach(([key, data]) => {
-    if (data.correct >= 3) {
+    if (data.percentage >= 75) {
       identifiedStrengths.push({
         skill: key,
         label: data.label,
-        score: `${data.correct}/${data.total}`,
+        score: `${data.correct} / ${data.total}`,
+        percentage: data.percentage,
       });
     } else {
       identifiedWeaknesses.push({
         skill: key,
         label: data.label,
-        score: `${data.correct}/${data.total}`,
+        score: `${data.correct} / ${data.total}`,
+        percentage: data.percentage,
+      });
+    }
+
+    if (data.percentage < 50) {
+      criticalSkillGaps.push({
+        skill: key,
+        label: data.label,
+        score: `${data.correct} / ${data.total}`,
       });
     }
   });
 
-  // Determine Readiness Category
+  // Determine Readiness Classification (v2.0.0 rules)
   let readinessCategory;
+  const hasSub50Skill = criticalSkillGaps.length > 0;
 
-  const allSkillsAtLeast3 = Object.values(skills).every((s) => s.correct >= 3);
-
-  if (correctCount >= 10) {
-    if (allSkillsAtLeast3) {
+  if (overallPercentage >= 85) {
+    if (!hasSub50Skill) {
       readinessCategory = {
         key: "strong",
         label: "Strong Practice Performance",
         badgeVariant: "emerald",
         headline: "Ready for Goethe / ÖSD A1 Registration",
         description:
-          "Outstanding performance across all core competencies! You demonstrate reliable A1 vocabulary, grammar, and reading comprehension. You are well positioned to book your examination.",
-        advice: "Maintain your rhythm by doing full-length official timed sample exams and practicing your self-introduction for the oral exam.",
+          "Outstanding balance across Vocabulary, Grammar, Reading, and Speaking! You comfortably meet the A1 passing standard and are well positioned to book your exam date.",
+        advice: "Maintain your rhythm by doing full-length official timed sample exams and practicing your self-introduction.",
       };
     } else {
       readinessCategory = {
         key: "almost_there",
         label: "Almost There (Skill Imbalance)",
         badgeVariant: "sky",
-        headline: "High Score with Isolated Skill Gap",
+        headline: "High Score with an Isolated Skill Gap",
         description:
-          "You scored high overall (10+), but at least one skill scored below 3/4. Official Goethe and ÖSD exams require balanced competence across all modules.",
-        advice: "Focus your remaining preparation specifically on your lower-scoring skill before booking your test date.",
+          "Your overall percentage is high, but at least one core skill scored below 50%. Both Goethe and ÖSD require balanced competence to avoid failing individual exam sub-tests.",
+        advice: `Focus your preparation specifically on your weakest skill (${criticalSkillGaps.map((s) => s.label).join(', ')}) before booking.`,
       };
     }
-  } else if (correctCount >= 8) {
+  } else if (overallPercentage >= 70) {
     readinessCategory = {
       key: "almost_there",
       label: "Almost There",
       badgeVariant: "sky",
       headline: "Solid Foundation with Minor Skill Gaps",
       description:
-        "You have a firm grasp of essential A1 patterns, but a few gaps remain in specific grammar rules or vocabulary domains. A little targeted practice will get you over the line.",
-      advice: "Spend 1 to 2 weeks revising your incorrect question topics and practicing everyday reading notices before booking.",
+        "You demonstrate good grasp of A1 communication, but specific grammatical rules or speaking fluidity require 1-2 weeks of focused review.",
+      advice: "Dedicate 10-14 days to practicing the specific mistakes and drills listed in your study plan below.",
     };
-  } else if (correctCount >= 5) {
+  } else if (overallPercentage >= 50) {
     readinessCategory = {
       key: "targeted_practice",
       label: "Needs Targeted Practice",
       badgeVariant: "amber",
       headline: "Noticeable Gaps — Do Not Book Exam Yet",
       description:
-        "You have acquired basic A1 awareness, but inconsistent grammar or limited vocabulary would put you at significant risk of failing an official examination.",
-      advice: "Review core grammar rules (accusative articles, verb conjugations) and study everyday high-frequency word lists. Retake this assessment in 2-3 weeks.",
+        "You have basic German awareness, but inconsistent grammar, limited vocabulary, or hesitant speaking put you at significant risk of failing an official exam.",
+      advice: "Review core grammar rules (accusative articles, verb conjugations) and practice spoken responses out loud before retesting in 2-3 weeks.",
     };
   } else {
     readinessCategory = {
@@ -142,20 +170,23 @@ export function calculateAssessmentScore(userAnswers = {}) {
       headline: "Foundational Review Required",
       description:
         "You are in the early stages of German A1. Booking an official examination at this stage would likely result in lost registration fees and frustration.",
-      advice: "Follow a structured A1 course (Goethe/DW Nicos Weg/Hueber Menschen) from Chapter 1. Build basic sentence structures and vocabulary steadily.",
+      advice: "Follow a structured A1 course (Goethe/DW Nicos Weg/Hueber) from Chapter 1. Build basic vocabulary and sentence structures steadily.",
     };
   }
 
   return {
-    totalQuestions,
-    correctCount,
+    totalQuestions: 12,
+    totalPoints: 12,
+    correctCount: roundedTotalPoints,
     percentage: overallPercentage,
     skills,
     readinessCategory,
     identifiedStrengths,
     identifiedWeaknesses,
+    criticalSkillGaps,
     incorrectQuestions,
     correctQuestions,
+    speakingEvaluations,
     evaluatedAt: new Date().toISOString(),
   };
 }

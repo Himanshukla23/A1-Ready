@@ -1,5 +1,7 @@
 import React, { createContext, useContext, useState } from 'react';
-import { calculateAssessmentScore } from '../utils/scoring';
+import { calculateAssessmentScore } from '../utils/scoring.js';
+import { ALL_ASSESSMENT_TASKS } from '../services/assessmentService.js';
+import { evaluateSpeakingLocally } from '../utils/speakingRubric.js';
 
 const AssessmentContext = createContext(null);
 
@@ -7,7 +9,13 @@ export function AssessmentProvider({ children }) {
   // 'landing' | 'assessment' | 'results'
   const [stage, setStage] = useState('landing');
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
+
+  // Objective answers: { q1: "A", q2: "B", ... }
   const [answers, setAnswers] = useState({});
+
+  // Speaking responses: { s1: { transcript: "...", score: 2.5, evaluation: {...} } }
+  const [speakingResponses, setSpeakingResponses] = useState({});
+
   const [results, setResults] = useState(null);
   const [doroOpen, setDoroOpen] = useState(false);
 
@@ -24,8 +32,15 @@ export function AssessmentProvider({ children }) {
     }));
   };
 
+  const setSpeakingResponse = (promptId, responseData) => {
+    setSpeakingResponses((prev) => ({
+      ...prev,
+      [promptId]: responseData,
+    }));
+  };
+
   const nextQuestion = () => {
-    setCurrentQuestionIndex((prev) => Math.min(prev + 1, 11));
+    setCurrentQuestionIndex((prev) => Math.min(prev + 1, ALL_ASSESSMENT_TASKS.length - 1));
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
@@ -35,21 +50,37 @@ export function AssessmentProvider({ children }) {
   };
 
   const goToQuestion = (index) => {
-    if (index >= 0 && index <= 11) {
+    if (index >= 0 && index < ALL_ASSESSMENT_TASKS.length) {
       setCurrentQuestionIndex(index);
       window.scrollTo({ top: 0, behavior: 'smooth' });
     }
   };
 
   const submitAssessment = () => {
-    const calculatedResults = calculateAssessmentScore(answers);
+    // Ensure all submitted speaking tasks have evaluations computed
+    const finalSpeakingResponses = { ...speakingResponses };
+    ['s1', 's2', 's3'].forEach((sId) => {
+      const existing = finalSpeakingResponses[sId];
+      if (existing && existing.transcript && typeof existing.score !== 'number') {
+        const localEval = evaluateSpeakingLocally(sId, existing.transcript);
+        finalSpeakingResponses[sId] = {
+          ...existing,
+          score: localEval.score,
+          evaluation: localEval,
+        };
+      }
+    });
+
+    const calculatedResults = calculateAssessmentScore(answers, finalSpeakingResponses);
     setResults(calculatedResults);
+    setSpeakingResponses(finalSpeakingResponses);
     setStage('results');
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
   const retakeAssessment = () => {
     setAnswers({});
+    setSpeakingResponses({});
     setResults(null);
     setCurrentQuestionIndex(0);
     setStage('assessment');
@@ -74,6 +105,8 @@ export function AssessmentProvider({ children }) {
         setCurrentQuestionIndex,
         answers,
         setAnswers,
+        speakingResponses,
+        setSpeakingResponse,
         results,
         setResults,
         doroOpen,

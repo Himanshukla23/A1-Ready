@@ -1,0 +1,44 @@
+{
+  "category": "A1 Speaking (Sprechen)",
+  "level": "CEFR A1",
+  "examination_modules": [
+    {
+      "id": "sprechen_teil_1",
+      "name": "Teil 1: Sich vorstellen (Self-Introduction)",
+      "format": "Learner speaks freely about personal facts using structured prompt cards.",
+      "core_topics": ["Name", "Alter", "Land / Herkunft", "Wohnort", "Sprachen", "Beruf", "Hobby"],
+      "useful_phrases": [
+        "Ich heiße ... / Mein Name ist ...",
+        "Ich bin ... Jahre alt.",
+        "Ich komme aus ... und wohne jetzt in ...",
+        "Ich spreche ... und ein bisschen Deutsch.",
+        "Ich arbeite als ... / Ich bin Student(in)."
+      ]
+    },
+    {
+      "id": "sprechen_teil_2",
+      "name": "Teil 2: Um Informationen bitten & Bitten formulieren (Requests & Inquiries)",
+      "format": "Learner formulates a polite question or request based on a word/picture card and responds.",
+      "core_topics": ["Einkaufen", "Restaurant / Café", "Bahnhof / Reise", "Post / Bank"],
+      "useful_phrases": [
+        "Ich möchte bitte ... bestellen.",
+        "Ich hätte gern einen Kaffee mit Milch.",
+        "Können Sie mir bitte helfen?",
+        "Entschuldigung, wie viel kostet das?",
+        "Kann ich bitte zahlen / die Rechnung haben?"
+      ]
+    },
+    {
+      "id": "sprechen_teil_3",
+      "name": "Teil 3: Freizeit & Alltag (Everyday Life & Hobbies)",
+      "format": "Learner answers questions about personal habits, daily routines, and hobbies.",
+      "core_topics": ["Wochenende", "Hobbys", "Sport", "Freunde treffen", "Lieblingsessen"],
+      "useful_phrases": [
+        "Am Wochenende spiele ich gern Fußball.",
+        "In meiner Freizeit lese ich gern Bücher.",
+        "Ich treffe mich oft mit Freunden im Park.",
+        "Samstags schlafe ich gern lange aus."
+      ]
+    }
+  ]
+}

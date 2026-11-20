@@ -1,21 +1,22 @@
 /**
- * 12 Original A1 German Assessment Questions
- * 4 Vocabulary (Wortschatz)
- * 4 Grammar (Grammatik)
- * 4 Reading Comprehension (Leseverstehen)
+ * 9 Original A1 German Objective Assessment Questions
+ * 3 Vocabulary (Wortschatz) - q1 to q3
+ * 3 Grammar (Grammatik) - q4 to q6
+ * 3 Reading Comprehension (Leseverstehen) - q7 to q9
+ * Max score: 9 (3 + 3 + 3)
  * Aligned with Goethe-Zertifikat A1 (Start Deutsch 1) & ÖSD Zertifikat A1 standards.
  */
 
-export const QUESTIONS = [
+export const OBJECTIVE_QUESTIONS = [
   // ==========================================
-  // SKILL 1: VOCABULARY (Wortschatz) - Q1 to Q4
+  // SKILL 1: VOCABULARY (Wortschatz) - q1 to q3
   // ==========================================
   {
     id: "q1",
     skill: "vocabulary",
-    skillLabel: "Wortschatz",
+    skillLabel: "Vocabulary (Wortschatz)",
     topic: "Essen & Trinken (Food & Drinks)",
-    instruction: "Wählen Sie das passende Wort für die Lücke.",
+    instruction: "Choose the correct word to fill the blank.",
     question: "Am Morgen trinke ich gern einen heißen ______ mit Milch und Zucker.",
     options: [
       { id: "A", text: "Kaffee" },
@@ -24,14 +25,14 @@ export const QUESTIONS = [
       { id: "D", text: "Fisch" },
     ],
     correctOptionId: "A",
-    explanation: "Kaffee ist ein heißes Getränk, das typischerweise morgens mit Milch und Zucker getrunken wird. Apfel, Käse und Fisch sind feste Nahrungsmittel.",
+    explanation: "Kaffee (coffee) is a hot morning beverage typically enjoyed with milk and sugar. Apfel (apple), Käse (cheese), and Fisch (fish) are solid foods.",
   },
   {
     id: "q2",
     skill: "vocabulary",
-    skillLabel: "Wortschatz",
-    topic: "Uhrzeit & Tagesablauf (Time & Daily Routine)",
-    instruction: "Wählen Sie das passende Wort für die Lücke.",
+    skillLabel: "Vocabulary (Wortschatz)",
+    topic: "Uhrzeit & Tagesablauf (Daily Routine)",
+    instruction: "Choose the correct separable verb component.",
     question: "Der Deutschkurs beginnt um 09:00 Uhr und ______ um 12:30 Uhr auf.",
     options: [
       { id: "A", text: "steht" },
@@ -40,15 +41,15 @@ export const QUESTIONS = [
       { id: "D", text: "macht" },
     ],
     correctOptionId: "B",
-    explanation: "Das trennbare Verb 'aufhören' bedeutet beenden oder enden ('hört ... auf'). 'Aufstehen' bezieht sich auf Personen am Morgen, nicht auf Unterricht.",
+    explanation: "The separable verb 'aufhören' means to finish or end ('hört ... auf'). 'Aufstehen' refers to waking up/getting out of bed in the morning.",
   },
   {
     id: "q3",
     skill: "vocabulary",
-    skillLabel: "Wortschatz",
+    skillLabel: "Vocabulary (Wortschatz)",
     topic: "Verkehr & Unterwegs (Transportation & City)",
-    instruction: "Wählen Sie das passende Wort für die Lücke.",
-    question: "Entschuldigung, wie komme ich zum ______? Ich möchte einen Zug nach Berlin nehmen.",
+    instruction: "Choose the correct location word.",
+    question: "Entschuldigung, wie komme ich zum ______? Ich möchte einen Zug nach Wien nehmen.",
     options: [
       { id: "A", text: "Supermarkt" },
       { id: "B", text: "Bahnhof" },
@@ -56,34 +57,18 @@ export const QUESTIONS = [
       { id: "D", text: "Schwimmbad" },
     ],
     correctOptionId: "B",
-    explanation: "Züge fahren am Bahnhof ab. Im Supermarkt kauft man ein, im Krankenhaus behandelt man Kranke, und im Schwimmbad schwimmt man.",
-  },
-  {
-    id: "q4",
-    skill: "vocabulary",
-    skillLabel: "Wortschatz",
-    topic: "Familie & Personen (Family & People)",
-    instruction: "Wählen Sie das passende Wort für die Lücke.",
-    question: "Die Schwester von meiner Mutter ist meine ______.",
-    options: [
-      { id: "A", text: "Tante" },
-      { id: "B", text: "Cousine" },
-      { id: "C", text: "Oma" },
-      { id: "D", text: "Tochter" },
-    ],
-    correctOptionId: "A",
-    explanation: "Die Schwester der Mutter oder des Vaters nennt man 'Tante'. Cousine ist das Kind von Onkel/Tante, Oma ist die Großmutter.",
+    explanation: "Trains depart from the train station (Bahnhof). Supermarkt is for groceries, Krankenhaus is for medical care, and Schwimmbad is a swimming pool.",
   },
 
   // ==========================================
-  // SKILL 2: GRAMMAR (Grammatik) - Q5 to Q8
+  // SKILL 2: GRAMMAR (Grammatik) - q4 to q6
   // ==========================================
   {
-    id: "q5",
+    id: "q4",
     skill: "grammar",
-    skillLabel: "Grammatik",
+    skillLabel: "Grammar (Grammatik)",
     topic: "Bestimmte & Unbestimmte Artikel (Akkusativ)",
-    instruction: "Wählen Sie den grammatikalisch richtigen Artikel.",
+    instruction: "Choose the grammatically correct accusative article.",
     question: "Herr Müller kauft heute ______ neuen Tisch (maskulin).",
     options: [
       { id: "A", text: "ein" },
@@ -92,14 +77,14 @@ export const QUESTIONS = [
       { id: "D", text: "einer" },
     ],
     correctOptionId: "B",
-    explanation: "Das Verb 'kaufen' verlangt den Akkusativ. Maskuline Nomen (der Tisch) verändern ihren unbestimmten Artikel im Akkusativ zu 'einen'.",
+    explanation: "The verb 'kaufen' takes the accusative case. Masculine nouns (der Tisch) change their indefinite article from 'ein' to 'einen' in the accusative.",
   },
   {
-    id: "q6",
+    id: "q5",
     skill: "grammar",
-    skillLabel: "Grammatik",
+    skillLabel: "Grammar (Grammatik)",
     topic: "Unregelmäßige Verben (Vokalwechsel im Präsens)",
-    instruction: "Wählen Sie die korrekte Verbform für 'du'.",
+    instruction: "Choose the correct 2nd person singular verb form.",
     question: "______ du am Wochenende mit dem Fahrrad zur Universität?",
     options: [
       { id: "A", text: "Fährst" },
@@ -108,14 +93,14 @@ export const QUESTIONS = [
       { id: "D", text: "Fahre" },
     ],
     correctOptionId: "A",
-    explanation: "Das Verb 'fahren' hat einen Vokalwechsel in der 2. und 3. Person Singular: a -> ä (du fährst, er/sie/es fährt).",
+    explanation: "The strong verb 'fahren' undergoes a stem-vowel change in 2nd and 3rd person singular: a -> ä (du fährst, er/sie/es fährt).",
   },
   {
-    id: "q7",
+    id: "q6",
     skill: "grammar",
-    skillLabel: "Grammatik",
+    skillLabel: "Grammar (Grammatik)",
     topic: "Modalverben (können)",
-    instruction: "Wählen Sie das passende Modalverb.",
+    instruction: "Choose the correct modal verb form.",
     question: "Anna ist krank. Sie ______ heute leider nicht zur Arbeit kommen.",
     options: [
       { id: "A", text: "kann" },
@@ -124,34 +109,18 @@ export const QUESTIONS = [
       { id: "D", text: "könnt" },
     ],
     correctOptionId: "A",
-    explanation: "Die 3. Person Singular (sie = Anna) des Modalverbs 'können' heißt 'kann'. Die 1. und 3. Person Singular sind bei Modalverben immer identisch (ich kann / er, sie, es kann).",
-  },
-  {
-    id: "q8",
-    skill: "grammar",
-    skillLabel: "Grammatik",
-    topic: "Präpositionen mit Dativ (Ortsangaben)",
-    instruction: "Wählen Sie die korrekte Präposition mit Artikel.",
-    question: "Wo ist Lisa? — Sie ist gerade ______ Hause.",
-    options: [
-      { id: "A", text: "nach" },
-      { id: "B", text: "bei" },
-      { id: "C", text: "zu" },
-      { id: "D", text: "in" },
-    ],
-    correctOptionId: "C",
-    explanation: "Die feste A1-Redewendung für den Aufenthaltsort lautet 'zu Hause' (Where are you? = Wo bist du? — Zu Hause). Die Bewegung nach Hause heißt 'nach Hause'.",
+    explanation: "In German modal verbs, 1st and 3rd person singular forms are identical and have no ending: 'ich kann', 'sie kann'.",
   },
 
   // ==========================================
-  // SKILL 3: READING (Leseverstehen) - Q9 to Q12
+  // SKILL 3: READING (Leseverstehen) - q7 to q9
   // ==========================================
   {
-    id: "q9",
+    id: "q7",
     skill: "reading",
-    skillLabel: "Leseverstehen",
-    topic: "Öffnungszeiten & Schilder (Opening Hours Notice)",
-    instruction: "Lesen Sie das Hinweisschild und beantworten Sie die Frage.",
+    skillLabel: "Reading (Leseverstehen)",
+    topic: "Öffnungszeiten & Schilder (Store Hours Notice)",
+    instruction: "Read the shop notice and answer the question.",
     passage: "Bäckerei Sonnenschein\nÖffnungszeiten:\nMontag bis Freitag: 06:30 – 18:30 Uhr\nSamstag: 07:00 – 13:00 Uhr\nSonntag und Feiertage: Geschlossen",
     question: "Wann kann man am Samstag frische Brötchen kaufen?",
     options: [
@@ -161,14 +130,14 @@ export const QUESTIONS = [
       { id: "D", text: "Die Bäckerei ist samstags geschlossen." },
     ],
     correctOptionId: "C",
-    explanation: "Laut Hinweisschild hat die Bäckerei samstags von 07:00 bis 13:00 Uhr geöffnet. 10:00 Uhr liegt innerhalb dieser Zeit.",
+    explanation: "The notice states the bakery is open Saturdays from 07:00 to 13:00. 10:00 Uhr falls within that timeframe.",
   },
   {
-    id: "q10",
+    id: "q8",
     skill: "reading",
-    skillLabel: "Leseverstehen",
-    topic: "Persönliche E-Mail / Einladung (Personal Invitation)",
-    instruction: "Lesen Sie die E-Mail und wählen Sie die richtige Aussage.",
+    skillLabel: "Reading (Leseverstehen)",
+    topic: "Persönliche E-Mail / Einladung (Party Invitation)",
+    instruction: "Read the invitation email and answer the question.",
     passage: "Hallo Max,\nich feiere am Freitag meinen 25. Geburtstag! Die Party beginnt um 19:30 Uhr bei mir im Garten. Bitte bring etwas zu trinken mit. Für Essen und Musik habe ich schon gesorgt.\nViele Grüße,\nStefan",
     question: "Was soll Max zur Party mitbringen?",
     options: [
@@ -178,32 +147,15 @@ export const QUESTIONS = [
       { id: "D", text: "Er muss nichts mitbringen." },
     ],
     correctOptionId: "B",
-    explanation: "Stefan schreibt ausdrücklich: 'Bitte bring etwas zu trinken mit.' Um Essen und Musik kümmert sich Stefan selbst.",
+    explanation: "Stefan explicitly writes: 'Bitte bring etwas zu trinken mit' (Please bring something to drink). Food and music are already taken care of.",
   },
   {
-    id: "q11",
+    id: "q9",
     skill: "reading",
-    skillLabel: "Leseverstehen",
-    topic: "Wohnungsanzeige (Apartment Classifieds)",
-    instruction: "Lesen Sie die Kleinanzeige und beantworten Sie die Frage.",
-    passage: "Schöne 2-Zimmer-Wohnung in München-Pasing ab 1. Mai frei.\nGröße: 55 m², mit Balkon und Einbauküche.\nKaltmiete: 750 € + Nebenkosten 150 €.\nKeine Haustiere erlaubt.\nKontakt: immobilien-schmidt@web.de",
-    question: "Welche Aussage über die Wohnung ist richtig?",
-    options: [
-      { id: "A", text: "Hunde und Katzen sind erlaubt." },
-      { id: "B", text: "Die Wohnung hat drei Zimmer." },
-      { id: "C", text: "Die Wohnung ist ab dem 1. Mai verfügbar." },
-      { id: "D", text: "Die Gesamtkosten betragen 750 €." },
-    ],
-    correctOptionId: "C",
-    explanation: "In der Anzeige steht: 'ab 1. Mai frei'. Haustiere sind verboten ('Keine Haustiere erlaubt'), sie hat 2 Zimmer und die Miete beträgt 750 € + 150 € NK.",
-  },
-  {
-    id: "q12",
-    skill: "reading",
-    skillLabel: "Leseverstehen",
+    skillLabel: "Reading (Leseverstehen)",
     topic: "Durchsage / Fahrplan (Transport Notice)",
-    instruction: "Lesen Sie die Informationstafel am Hauptbahnhof.",
-    passage: "Achtung Fahrgäste!\nDer ICE 582 nach Hamburg Altona, planmäßige Abfahrt 14:15 Uhr von Gleis 4, fährt heute ausnahmsweise von Gleis 7 ab.\nGrund ist eine Weichenreparatur. Bitte Gleisänderung beachten!",
+    instruction: "Read the public railway announcement at the station.",
+    passage: "Achtung Fahrgäste!\nDer ICE 582 nach Hamburg, planmäßige Abfahrt 14:15 Uhr von Gleis 4, fährt heute ausnahmsweise von Gleis 7 ab.\nGrund ist eine Weichenreparatur. Bitte Gleisänderung beachten!",
     question: "Von welchem Gleis fährt der Zug nach Hamburg heute ab?",
     options: [
       { id: "A", text: "Von Gleis 4" },
@@ -212,6 +164,9 @@ export const QUESTIONS = [
       { id: "D", text: "Von Gleis 14" },
     ],
     correctOptionId: "B",
-    explanation: "Die Anzeige meldet: 'fährt heute ausnahmsweise von Gleis 7 ab' wegen einer Weichenreparatur (geplant war Gleis 4).",
+    explanation: "The notice states: 'fährt heute ausnahmsweise von Gleis 7 ab' (departs exceptionally from platform 7 today) due to repairs.",
   },
 ];
+
+// Alias for backwards compatibility
+export const QUESTIONS = OBJECTIVE_QUESTIONS;

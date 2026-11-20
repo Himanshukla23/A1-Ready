@@ -8,6 +8,10 @@
       "dest": "/api/doro.js"
     },
     {
+      "src": "/api/evaluate-speaking",
+      "dest": "/api/evaluate-speaking.js"
+    },
+    {
       "src": "/(.*)",
       "dest": "/index.html"
     }

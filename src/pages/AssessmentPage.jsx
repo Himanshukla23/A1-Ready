@@ -1,8 +1,9 @@
 import React, { useState } from 'react';
 import { useAssessment } from '../context/AssessmentContext';
-import { QUESTIONS } from '../data/questions.js';
+import { ALL_ASSESSMENT_TASKS } from '../services/assessmentService.js';
 import ProgressBar from '../components/ProgressBar';
 import QuestionCard from '../components/QuestionCard';
+import SpeakingQuestion from '../components/SpeakingQuestion';
 import { validateCompletion } from '../services/assessmentService.js';
 import {
   ChevronLeft,
@@ -13,6 +14,7 @@ import {
   ArrowLeft,
   CheckCircle2,
   X,
+  Mic,
 } from 'lucide-react';
 
 export default function AssessmentPage() {
@@ -22,6 +24,7 @@ export default function AssessmentPage() {
     prevQuestion,
     goToQuestion,
     answers,
+    speakingResponses,
     submitAssessment,
     goToLanding,
     toggleDoro,
@@ -30,14 +33,14 @@ export default function AssessmentPage() {
   const [showIncompleteAlert, setShowIncompleteAlert] = useState(false);
   const [showSubmitModal, setShowSubmitModal] = useState(false);
 
-  const currentQuestion = QUESTIONS[currentQuestionIndex] || QUESTIONS[0];
-  const isFirstQuestion = currentQuestionIndex === 0;
-  const isLastQuestion = currentQuestionIndex === QUESTIONS.length - 1;
+  const currentTask = ALL_ASSESSMENT_TASKS[currentQuestionIndex] || ALL_ASSESSMENT_TASKS[0];
+  const isFirstTask = currentQuestionIndex === 0;
+  const isLastTask = currentQuestionIndex === ALL_ASSESSMENT_TASKS.length - 1;
 
-  const validation = validateCompletion(answers);
+  const validation = validateCompletion(answers, speakingResponses);
 
   const handleNextOrSubmit = () => {
-    if (isLastQuestion) {
+    if (isLastTask) {
       handleAttemptSubmit();
     } else {
       nextQuestion();
@@ -80,7 +83,7 @@ export default function AssessmentPage() {
           </button>
         </div>
 
-        {/* Progress Bar & Question Jump Pills */}
+        {/* Progress Bar & 12 Task Jump Pills */}
         <ProgressBar />
 
         {/* Incomplete Submission Alert Banner */}
@@ -90,24 +93,34 @@ export default function AssessmentPage() {
               <AlertCircle className="w-5 h-5 text-amber-600 shrink-0 mt-0.5" />
               <div className="flex-1">
                 <h4 className="font-bold text-sm">
-                  Please answer all 12 questions ({validation.totalCount - validation.answeredCount} unanswered)
+                  Please complete all 12 tasks ({validation.totalCount - validation.answeredCount} pending)
                 </h4>
                 <p className="text-xs text-amber-800 mt-1">
-                  For an objective diagnostic report, all questions must be answered. Click any question below to jump directly to it:
+                  For an accurate 4-skill diagnostic report, all 9 multiple-choice and 3 speaking responses must be recorded. Click any pending task to jump to it:
                 </p>
                 <div className="flex flex-wrap gap-1.5 mt-2.5">
-                  {validation.unansweredIndices.map((idx) => (
-                    <button
-                      key={idx}
-                      onClick={() => {
-                        goToQuestion(idx);
-                        setShowIncompleteAlert(false);
-                      }}
-                      className="px-2.5 py-1 text-xs font-bold rounded-md bg-white border border-amber-300 text-amber-900 hover:bg-amber-100"
-                    >
-                      Question {idx + 1}
-                    </button>
-                  ))}
+                  {validation.unansweredIndices.map((idx) => {
+                    const task = ALL_ASSESSMENT_TASKS[idx];
+                    const isSpeaking = task.skill === 'speaking';
+
+                    return (
+                      <button
+                        key={idx}
+                        onClick={() => {
+                          goToQuestion(idx);
+                          setShowIncompleteAlert(false);
+                        }}
+                        className={`px-2.5 py-1 text-xs font-bold rounded-md border inline-flex items-center gap-1 hover:bg-amber-100 ${
+                          isSpeaking
+                            ? 'bg-rose-50 text-rose-900 border-rose-300'
+                            : 'bg-white text-amber-900 border-amber-300'
+                        }`}
+                      >
+                        {isSpeaking && <Mic className="w-3 h-3 text-rose-600" />}
+                        <span>Task {idx + 1}</span>
+                      </button>
+                    );
+                  })}
                 </div>
               </div>
               <button
@@ -121,16 +134,20 @@ export default function AssessmentPage() {
           </div>
         )}
 
-        {/* Current Question Card */}
-        <QuestionCard question={currentQuestion} />
+        {/* Active Task: Speaking Task vs Objective Question */}
+        {currentTask.skill === 'speaking' ? (
+          <SpeakingQuestion question={currentTask} />
+        ) : (
+          <QuestionCard question={currentTask} />
+        )}
 
         {/* Bottom Navigation Toolbar */}
         <div className="mt-6 flex items-center justify-between gap-4">
           <button
             onClick={prevQuestion}
-            disabled={isFirstQuestion}
+            disabled={isFirstTask}
             className={`inline-flex items-center gap-2 px-5 py-3 rounded-xl font-semibold text-sm transition ${
-              isFirstQuestion
+              isFirstTask
                 ? 'bg-slate-200 text-slate-400 cursor-not-allowed'
                 : 'bg-white hover:bg-slate-100 text-slate-700 border border-slate-300 shadow-xs'
             }`}
@@ -140,17 +157,17 @@ export default function AssessmentPage() {
           </button>
 
           <div className="flex items-center gap-3">
-            {validation.isComplete && !isLastQuestion && (
+            {validation.isComplete && !isLastTask && (
               <button
                 onClick={handleAttemptSubmit}
                 className="hidden sm:inline-flex items-center gap-2 px-4 py-3 rounded-xl font-bold text-sm bg-emerald-600 hover:bg-emerald-700 text-white shadow-sm transition"
               >
                 <Send className="w-4 h-4" />
-                <span>Evaluate Now</span>
+                <span>Evaluate 4-Skill Diagnostic</span>
               </button>
             )}
 
-            {isLastQuestion ? (
+            {isLastTask ? (
               <button
                 onClick={handleAttemptSubmit}
                 className="inline-flex items-center gap-2 px-6 py-3 rounded-xl font-bold text-sm bg-sky-600 hover:bg-sky-700 text-white shadow-md shadow-sky-600/20 transition"
@@ -163,7 +180,7 @@ export default function AssessmentPage() {
                 onClick={nextQuestion}
                 className="inline-flex items-center gap-2 px-6 py-3 rounded-xl font-bold text-sm bg-sky-600 hover:bg-sky-700 text-white shadow-md shadow-sky-600/20 transition"
               >
-                <span>Next Question</span>
+                <span>Next Task</span>
                 <ChevronRight className="w-4 h-4" />
               </button>
             )}
@@ -180,11 +197,11 @@ export default function AssessmentPage() {
             </div>
 
             <h3 className="text-xl font-extrabold text-slate-900">
-              Evaluate Diagnostic Assessment?
+              Submit & Evaluate 4-Skill Diagnostic?
             </h3>
 
             <p className="mt-2 text-sm text-slate-600 leading-relaxed">
-              You have completed all <strong>12 questions</strong>. The deterministic engine will now calculate your overall readiness, skill breakdown (Vocabulary, Grammar, Reading), and official Goethe/ÖSD booking advice.
+              You have completed all <strong>12 tasks</strong> (3 Vocabulary, 3 Grammar, 3 Reading, and 3 Speaking). The hybrid scoring engine will evaluate objective items deterministically and score spoken responses against the 4-dimension CEFR A1 rubric.
             </p>
 
             <div className="mt-6 flex flex-col sm:flex-row items-center gap-3">
@@ -192,13 +209,13 @@ export default function AssessmentPage() {
                 onClick={confirmSubmit}
                 className="w-full sm:w-auto flex-1 py-3 px-5 rounded-xl font-bold text-sm bg-emerald-600 hover:bg-emerald-700 text-white shadow-md transition"
               >
-                Yes, View Report
+                Yes, View Results
               </button>
               <button
                 onClick={() => setShowSubmitModal(false)}
                 className="w-full sm:w-auto py-3 px-5 rounded-xl font-semibold text-sm bg-slate-100 hover:bg-slate-200 text-slate-700 transition"
               >
-                Review Answers
+                Review Responses
               </button>
             </div>
           </div>

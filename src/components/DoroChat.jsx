@@ -1,7 +1,8 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useAssessment } from '../context/AssessmentContext';
-import { QUESTIONS } from '../data/questions.js';
+import { ALL_ASSESSMENT_TASKS } from '../services/assessmentService.js';
 import { askDoro } from '../services/doroService.js';
+import { speakGermanText, stopSpeaking } from '../services/speechRecognitionService.js';
 import {
   Sparkles,
   X,
@@ -10,6 +11,7 @@ import {
   Bot,
   User,
   ShieldAlert,
+  Volume2,
 } from 'lucide-react';
 
 export default function DoroChat() {
@@ -17,32 +19,36 @@ export default function DoroChat() {
   const [messages, setMessages] = useState([]);
   const [input, setInput] = useState('');
   const [loading, setLoading] = useState(false);
+  const [speakingMsgIdx, setSpeakingMsgIdx] = useState(null);
   const messagesEndRef = useRef(null);
 
-  const currentQ = QUESTIONS[currentQuestionIndex] || QUESTIONS[0];
+  const currentTask = ALL_ASSESSMENT_TASKS[currentQuestionIndex] || ALL_ASSESSMENT_TASKS[0];
 
   // Initialize initial message when stage or Doro opens
   useEffect(() => {
     if (messages.length === 0) {
       if (stage === 'assessment') {
+        const isSpeaking = currentTask.skill === 'speaking';
         setMessages([
           {
             sender: 'doro',
-            text: `Hallo! I am Doro. You are currently on Question ${currentQuestionIndex + 1} (${currentQ.topic}). If you need help understanding a German grammar rule or vocabulary pattern, ask me anytime!\n\n(Note: I can explain concepts and give examples, but exam integrity rules prevent me from revealing direct test answers.)`,
+            text: isSpeaking
+              ? `Hallo! I am Doro. You are working on Speaking Task ${currentQuestionIndex + 1} (${currentTask.topic}). Speak clearly in full sentences. If you need helpful vocabulary phrases or grammar patterns, ask me anytime!\n\n(Note: During active tests, I explain rules and examples, but I cannot give away test answers.)`
+              : `Hallo! I am Doro. You are currently on Task ${currentQuestionIndex + 1} (${currentTask.topic}). If you need help understanding a German grammar rule or vocabulary pattern, ask me anytime!\n\n(Note: During active tests, I explain rules and examples, but I cannot give away direct test answers.)`,
           },
         ]);
       } else if (stage === 'results') {
         setMessages([
           {
             sender: 'doro',
-            text: `Congratulations on completing the 12-question diagnostic! You scored ${results?.correctCount || 0} of 12 points (${results?.percentage || 0}%). I can now break down each mistake in detail, explain why the rule works, or generate targeted practice drills. What would you like to work on?`,
+            text: `Congratulations on completing the 4-skill diagnostic! You scored ${results?.correctCount || 0} of 12 points (${results?.percentage || 0}%). I can now break down each mistake in detail, review your speaking responses, or generate targeted practice drills. What would you like to work on?`,
           },
         ]);
       } else {
         setMessages([
           {
             sender: 'doro',
-            text: 'Hallo! I am Doro, your personal A1 German learning companion for Goethe-Zertifikat A1 and ÖSD Zertifikat A1 preparation. How can I assist your German studies today?',
+            text: 'Hallo! I am Doro, your personal A1 German learning companion for Goethe-Zertifikat A1 and ÖSD Zertifikat A1 preparation across Vocabulary, Grammar, Reading, and Speaking. How can I assist you today?',
           },
         ]);
       }
@@ -54,6 +60,19 @@ export default function DoroChat() {
   }, [messages, loading]);
 
   if (!doroOpen) return null;
+
+  const handleSpeakText = (text, idx) => {
+    if (speakingMsgIdx === idx) {
+      stopSpeaking();
+      setSpeakingMsgIdx(null);
+    } else {
+      setSpeakingMsgIdx(idx);
+      speakGermanText(text, {
+        onEnd: () => setSpeakingMsgIdx(null),
+        onError: () => setSpeakingMsgIdx(null),
+      });
+    }
+  };
 
   const handleSend = async (customText = null) => {
     const textToSend = customText || input;
@@ -77,7 +96,7 @@ export default function DoroChat() {
       const aiResponse = await askDoro({
         stage: stage === 'results' ? 'after_assessment' : 'during_assessment',
         message: textToSend,
-        currentQuestionTopic: stage === 'assessment' ? currentQ.topic : '',
+        currentQuestionTopic: stage === 'assessment' ? currentTask.topic : '',
         assessmentSummary,
       });
 
@@ -105,19 +124,19 @@ export default function DoroChat() {
   const quickPrompts =
     stage === 'assessment'
       ? [
-          `Explain the rule for Question ${currentQuestionIndex + 1}`,
+          `Explain rules for Task ${currentQuestionIndex + 1}`,
+          'Useful phrases for A1 Speaking',
           'How does the Accusative case work?',
-          'When do I use "zu Hause" vs "nach Hause"?',
         ]
       : stage === 'results'
       ? [
+          'How can I improve my speaking score?',
           'Why was my reading question incorrect?',
           'Give me 3 practice sentences for accusative',
-          'What should I practice in the next 7 days?',
         ]
       : [
           'What does the Goethe / ÖSD A1 exam test?',
-          'How does this diagnostic work?',
+          'How does the speaking section work?',
         ];
 
   return (
@@ -132,7 +151,7 @@ export default function DoroChat() {
             <div className="flex items-center gap-1.5">
               <span className="font-extrabold text-sm tracking-tight">Doro AI</span>
               <span className="text-[10px] uppercase font-bold bg-white/20 px-1.5 py-0.5 rounded text-white">
-                A1 Tutor
+                Voice Tutor
               </span>
             </div>
             <p className="text-xs text-amber-100 font-medium">
@@ -140,7 +159,7 @@ export default function DoroChat() {
                 ? 'Exam Guard Active (Concepts & Rules)'
                 : stage === 'results'
                 ? 'Post-Exam Review & Study Drills'
-                : 'German Exam Companion'}
+                : 'German 4-Skill Companion'}
             </p>
           </div>
         </div>
@@ -184,7 +203,18 @@ export default function DoroChat() {
                   : 'bg-white border border-slate-200 text-slate-800 rounded-tl-xs shadow-xs'
               }`}
             >
-              <p className="whitespace-pre-line leading-relaxed">{msg.text}</p>
+              <div className="flex items-start justify-between gap-2">
+                <p className="whitespace-pre-line leading-relaxed flex-1">{msg.text}</p>
+                {msg.sender === 'doro' && (
+                  <button
+                    onClick={() => handleSpeakText(msg.text, idx)}
+                    className="p-1 rounded-md text-amber-600 hover:text-amber-800 hover:bg-amber-50 transition shrink-0"
+                    title={speakingMsgIdx === idx ? 'Stop speaking' : 'Listen in German'}
+                  >
+                    <Volume2 className={`w-3.5 h-3.5 ${speakingMsgIdx === idx ? 'animate-pulse text-amber-800' : ''}`} />
+                  </button>
+                )}
+              </div>
 
               {/* Render structured recommendations if present */}
               {msg.data?.recommendations && msg.data.recommendations.length > 0 && (
@@ -226,7 +256,7 @@ export default function DoroChat() {
             </div>
             <div className="bg-white border border-slate-200 p-3 rounded-2xl rounded-tl-xs shadow-xs flex items-center gap-2 text-xs text-slate-500">
               <Loader2 className="w-4 h-4 animate-spin text-amber-500" />
-              <span>Doro is preparing an explanation...</span>
+              <span>Doro is formulating an explanation...</span>
             </div>
           </div>
         )}
@@ -261,7 +291,7 @@ export default function DoroChat() {
             type="text"
             value={input}
             onChange={(e) => setInput(e.target.value)}
-            placeholder="Ask Doro about German grammar or vocabulary..."
+            placeholder="Ask Doro about German grammar or speaking..."
             disabled={loading}
             className="flex-1 bg-slate-100 border border-slate-300 rounded-xl px-3.5 py-2.5 text-xs sm:text-sm focus:outline-none focus:ring-2 focus:ring-amber-500 text-slate-800"
           />

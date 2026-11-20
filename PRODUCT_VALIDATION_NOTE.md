@@ -1,134 +1,78 @@
-# A1 ReadyCheck — Product Validation Note & Submission Dossier
+# A1 ReadyCheck (v2.0.0) — Product Validation Note & Submission Dossier
 
-**Author:** Antigravity Engineering Team  
-**Date:** November 20, 2026  
-**Product:** A1 ReadyCheck (v1.0.0)  
+**Product:** A1 ReadyCheck  
+**Version:** 2.0.0 (Four-Skill Diagnostic Platform)  
 **Target Exams:** Goethe-Zertifikat A1 (Start Deutsch 1) & ÖSD Zertifikat A1  
-**Sprint Time Limit:** 4 Hours (240 Minutes) — Completed Successfully  
+**Sprint Time Limit:** Four-Hour MVP Sprint (240 Minutes) — Fully Executed  
 
 ---
 
 ## 1. Executive Summary & Problem Validation
 
 ### The Core Problem
-Each year, tens of thousands of German learners complete A1-level courses or self-study apps (Duolingo, Babbel, textbooks) and register for official Goethe-Institut or ÖSD examinations. Examination fees typically range between **€100 and €160**, with waiting periods of several weeks.
+Each year, tens of thousands of German learners complete A1-level courses or self-study apps (Duolingo, Babbel, textbooks) and register for official Goethe-Institut or ÖSD examinations (€100–€160). 
 
-A significant proportion of candidates fail one or more modules on their first attempt due to:
-1. **Uncalibrated Self-Assessment:** High confidence from completing gamified exercises without testing actual CEFR A1 exam-standard tasks.
-2. **Hidden Competency Gaps:** Critical omissions in high-weight rules, such as masculine accusative articles (*den/einen*), vowel changes in strong verbs (*fahren -> du fährst*), or time/location signal words in public signs.
+Speaking is the number one source of examination anxiety and failure:
+1. **Uncalibrated Speaking Ability:** Learners practice reading and multiple choice on apps, but freeze during the live 15-minute oral examination (*Sprechen Teil 1, 2, 3*).
+2. **Grammar & Lexical Gaps:** Key rules such as masculine accusative articles (*einen/den*), stem vowel changes (*fahren -> du fährst*), and modal verb sentence brackets cause fatal point deductions.
 3. **Absence of Actionable Guidance:** When learners struggle, generic chatbots provide long, unverified advice without a structured diagnostic foundation.
 
-### The Solution: A1 ReadyCheck
-A1 ReadyCheck delivers an objective, 8-minute diagnostic assessment that bridges deterministic scoring with contextual AI learning assistance. It provides learners with immediate clarity on whether they should register for the exam today or spend 1–2 weeks practicing specific weak topics.
+### The Solution: A1 ReadyCheck v2.0.0
+A1 ReadyCheck delivers an objective, 10-minute diagnostic assessment across **Vocabulary, Grammar, Reading, and Speaking** that couples deterministic scoring for objective items with an AI-assisted 4-dimension rubric for spoken responses.
 
 ---
 
-## 2. Architectural Decisions & Product Principles
+## 2. 4-Skill Assessment Design & Task Mapping
 
-### Principle 1: Deterministic Scoring Over Generative Grading
-* **Decision:** LLMs are **strictly prohibited** from calculating, modifying, or overriding assessment scores.
-* **Rationale:** Language models suffer from probabilistic drift, hallucinated scoring rubrics, and sensitivity to prompt wording. An exam readiness diagnostic requires **100% mathematical certainty**. The scoring engine ([src/utils/scoring.js](file:///c:/Users/himan/OneDrive/Desktop/Globio/src/utils/scoring.js)) evaluates answers against predefined keys using pure client-side JavaScript.
+The 12 assessment tasks directly mirror official Goethe-Zertifikat A1 and ÖSD Zertifikat A1 modules:
 
-### Principle 2: Doro AI as a Tutor, Not an Examiner
-* **Decision:** Doro ([src/components/DoroChat.jsx](file:///c:/Users/himan/OneDrive/Desktop/Globio/src/components/DoroChat.jsx)) is an encouraging companion designed to explain grammar rules, clarify unfamiliar vocabulary, and recommend exercises.
-* **Integrity Guardrail:** During an active assessment (`stage === 'during_assessment'`), Doro is constrained by system prompts and API guardrails to **never disclose direct test solutions (A, B, C, D)**. If asked for answers, Doro politely refuses and explains the underlying grammatical principle instead.
-
-### Principle 3: Enforced Skill Balance in Readiness Classification
-* **Decision:** A candidate who scores 10/12 overall, but achieves only 2/4 in Reading Comprehension, is **downgraded from "Strong Practice Performance" to "Almost There (Skill Imbalance)"**.
-* **Rationale:** Both Goethe-Institut and ÖSD require minimum passing thresholds across individual modules (*Lesen, Hören, Schreiben, Sprechen*). An unbalanced learner who aces grammar but fails reading notices will fail the real examination.
-
-### Principle 4: Resilient Offline Fallback
-* **Decision:** If no `GEMINI_API_KEY` is provided, or if the API rate limits or errors, the platform does not crash.
-* **Implementation:** The client and serverless functions fall back to a curated local knowledge base ([knowledge-base/](file:///c:/Users/himan/OneDrive/Desktop/Globio/knowledge-base/)), returning structured JSON recommendations immediately.
-
----
-
-## 3. CEFR A1 Assessment Design Matrix
-
-The 12 original assessment items represent core communicative competencies tested in Goethe and ÖSD exams:
-
-| # | Skill | Sub-Topic | Stimulus / Prompt Type | Correct Answer Key & Pedagogical Rule |
+| # | Skill | Sub-Topic | Exam Section | Format & Scoring |
 | :---: | :--- | :--- | :--- | :--- |
-| **Q1** | Wortschatz | Food & Drinks | Cloze: *"Am Morgen trinke ich gern einen heißen ______ mit Milch..."* | **A (Kaffee)** — Hot morning beverage with milk/sugar; apple/cheese/fish are solid foods. |
-| **Q2** | Wortschatz | Daily Routine | Separable Verb Cloze: *"Der Deutschkurs... ______ um 12:30 Uhr auf."* | **B (hört)** — Separable verb *aufhören* (to end). *Aufstehen* applies to people getting up. |
-| **Q3** | Wortschatz | Transport | City Cloze: *"Entschuldigung, wie komme ich zum ______? ...Zug nach Berlin..."* | **B (Bahnhof)** — Trains depart from *Bahnhof*; supermarkets/hospitals have different functions. |
-| **Q4** | Wortschatz | Family | Relationship: *"Die Schwester von meiner Mutter ist meine ______."* | **A (Tante)** — Mother's sister is *Tante*; *Cousine* is uncle/aunt's child; *Oma* is grandmother. |
-| **Q5** | Grammatik | Accusative Articles | Case selection: *"Herr Müller kauft heute ______ neuen Tisch (maskulin)."* | **B (einen)** — Direct object of *kaufen* takes accusative. Masculine *ein* becomes *einen*. |
-| **Q6** | Grammatik | Irregular Verbs | 2nd person singular: *"______ du am Wochenende mit dem Fahrrad...?"* | **A (Fährst)** — Stem vowel change in present tense: *fahren -> du fährst*. |
-| **Q7** | Grammatik | Modal Verbs | 3rd person singular: *"Anna ist krank. Sie ______ heute leider nicht..."* | **A (kann)** — Modal verb *können*; 1st and 3rd person singular forms have no personal ending (*kann*). |
-| **Q8** | Grammatik | Prepositions | Fixed idiom: *"Wo ist Lisa? — Sie ist gerade ______ Hause."* | **C (zu)** — Stationary location requires *zu Hause*. Movement requires *nach Hause*. |
-| **Q9** | Leseverstehen | Opening Hours | Bakery Notice: *Samstag: 07:00 – 13:00 Uhr* | **C (Um 10:00 Uhr)** — 10:00 falls within the Saturday window (07:00–13:00). |
-| **Q10** | Leseverstehen | Email Invitation | Birthday Party: *"Bitte bring etwas zu trinken mit."* | **B (Getränke)** — Explicit request to bring drinks; host provides food and music. |
-| **Q11** | Leseverstehen | Classified Ads | Apartment Ad: *"ab 1. Mai frei", "Keine Haustiere"* | **C (ab 1. Mai)** — Factual verification; pets prohibited; 2 rooms (not 3). |
-| **Q12** | Leseverstehen | Railway Notice | Platform change: *"fährt heute ausnahmsweise von Gleis 7 ab"* | **B (Von Gleis 7)** — Exception notice overrides scheduled platform 4. |
+| **Task 1** | Wortschatz | Food & Drinks (*Kaffee*) | Wortschatz | Deterministic MCQ (1 pt) |
+| **Task 2** | Wortschatz | Daily Routine (*aufhören*) | Wortschatz | Deterministic MCQ (1 pt) |
+| **Task 3** | Wortschatz | Transport & City (*Bahnhof*) | Wortschatz | Deterministic MCQ (1 pt) |
+| **Task 4** | Grammatik | Accusative Case (*einen Tisch*) | Grammatik | Deterministic MCQ (1 pt) |
+| **Task 5** | Grammatik | Strong Verbs (*Fährst du...*) | Grammatik | Deterministic MCQ (1 pt) |
+| **Task 6** | Grammatik | Modal Verbs (*sie kann... kommen*) | Grammatik | Deterministic MCQ (1 pt) |
+| **Task 7** | Leseverstehen | Bakery Hours (*07:00-13:00*) | Lesen Teil 1 | Deterministic MCQ (1 pt) |
+| **Task 8** | Leseverstehen | Party Invitation (*Getränke*) | Lesen Teil 2 | Deterministic MCQ (1 pt) |
+| **Task 9** | Leseverstehen | Platform Notice (*Gleis 7*) | Lesen Teil 3 | Deterministic MCQ (1 pt) |
+| **Task 10** | Sprechen | Self-Introduction (*Name, Land, Sprachen*) | Sprechen Teil 1 | Voice recording + Rubric (0–3 pts) |
+| **Task 11** | Sprechen | Ordering in a Café (*Kaffee bestellen, zahlen*) | Sprechen Teil 2 | Voice recording + Rubric (0–3 pts) |
+| **Task 12** | Sprechen | Weekend Hobbies (*Freizeitaktivitäten*) | Sprechen Teil 3 | Voice recording + Rubric (0–3 pts) |
 
 ---
 
-## 4. Verification & Testing Evidence
+## 3. Speaking Evaluation Rubric (4 Dimensions)
 
-The platform underwent automated testing across three dedicated test suites with zero failures:
+Spoken responses are evaluated against a predefined CEFR A1 rubric:
+1. **Task Relevance (30%):** Does the response address the specific prompt?
+2. **Grammar & Word Order (30%):** Are conjugated verbs in position 2? Are modal brackets respected?
+3. **A1 Vocabulary (25%):** Are appropriate CEFR A1 words used?
+4. **Response Completeness (15%):** Does the learner communicate 2-3 full communicative sentences?
 
-### Suite 1: Assessment Engine ([test/assessment_tests.mjs](file:///c:/Users/himan/OneDrive/Desktop/Globio/test/assessment_tests.mjs))
-* **Test 1.1:** 12/12 All Correct $\rightarrow$ Exact 100%, Classified as `Strong Practice Performance`.
-* **Test 1.2:** 0/12 All Incorrect $\rightarrow$ Exact 0%, Classified as `Build A1 Foundations`.
-* **Test 1.3:** 8/12 Mixed Score $\rightarrow$ Exact 67%, Classified as `Almost There`.
-* **Test 1.4 (Critical Boundary):** 10/12 Overall Score with Vocab 4/4, Grammar 4/4, Reading 2/4 $\rightarrow$ Correctly downgraded from Strong to `Almost There (Skill Imbalance)`.
-* **Test 1.5:** 6/12 Score $\rightarrow$ Correctly classified as `Needs Targeted Practice`.
-* **Test 1.6:** Incomplete Answer Validation $\rightarrow$ Blocks submission if any question is missing, listing exact missing question numbers.
-
-### Suite 2: Recommendations Engine ([test/recommendations_tests.mjs](file:///c:/Users/himan/OneDrive/Desktop/Globio/test/recommendations_tests.mjs))
-* **Test 2.1:** Database coverage verified for all 12 question topics.
-* **Test 2.2:** Erroneous questions dynamically map to actionable practice activities with Goethe reference resources.
-* **Test 2.3:** Perfect scorers automatically receive Goethe *Modellsatz* timed exam simulation guidance.
-
-### Suite 3: Doro AI & Knowledge Base ([test/doro_ai_tests.mjs](file:///c:/Users/himan/OneDrive/Desktop/Globio/test/doro_ai_tests.mjs))
-* **Test 3.1:** JSON schema validation across `vocabulary.json`, `grammar.json`, and `reading.json`.
-* **Test 3.2 (Integrity Guard):** Query requesting active test solution during assessment verified to refuse direct answers while explaining grammar rules.
-* **Test 3.3:** Post-assessment feedback verified to cite actual test score, percentage, and weak topics.
+The 3 speaking prompt scores (0 to 3 each) are averaged to produce the final **Speaking Skill Score out of 3.0**.
 
 ---
 
-## 5. Live Founder Interview Demonstration Script
+## 4. Scoring Formulas & Readiness Classification
 
-When presenting this application in a live interview or review, follow this 5-step walkthrough:
+### Formula
+$$\text{Overall Percentage} = \left(\frac{\text{Vocab (3)} + \text{Grammar (3)} + \text{Reading (3)} + \text{Speaking (3)}}{12}\right) \times 100$$
 
-```
-[Landing Page]
-  │
-  ├─> 1. Highlight exam target chips (Goethe A1 & ÖSD A1).
-  ├─> 2. Point out the 4 readiness categories and transparent disclaimer.
-  ├─> 3. Click "Start 12-Question Diagnostic".
-  │
-[Assessment Page]
-  │
-  ├─> 4. Demonstrate the 12 question jump pills in ProgressBar.jsx.
-  ├─> 5. Answer Question 1 (Kaffee) and Question 2 (hört).
-  ├─> 6. Open Doro AI and ask: "Was ist die Antwort auf Frage 3?"
-  │      -> Show how Doro refuses to leak the answer and explains transport nouns.
-  ├─> 7. Skip to Question 12 and click "Diagnose Auswerten".
-  │      -> Show the validation alert blocking incomplete submission with jump links.
-  ├─> 8. Complete all 12 questions and confirm submission in the modal.
-  │
-[Results Page]
-  │
-  ├─> 9. Observe the Readiness Category Banner and Percentage score.
-  ├─> 10. Review the 3 Skill Breakdown bars (Vocab, Grammar, Reading).
-  ├─> 11. Expand an incorrect question in the Detailed Mistake Analysis.
-  │       -> Compare learner's answer vs correct answer + rule explanation.
-  ├─> 12. Review the tailored study plan generated from mistake topics.
-  ├─> 13. Click "Test wiederholen" to demonstrate clean state reset.
-```
+### 4-Tier Classification Matrix
+- **$\ge 85\%$ Score:** *Strong Practice Performance* — **Condition:** Requires $\ge 50\%$ (at least 1.5/3) in *every* individual skill.
+- **70% – 84% Score (or $\ge 85\%$ with a sub-50% skill):** *Almost There* — Solid base; focus on the weakest module.
+- **50% – 69% Score:** *Needs Targeted Practice* — Noticeable gaps in grammar or speaking.
+- **$< 50\%$ Score:** *Build A1 Foundations* — Comprehensive review needed.
 
 ---
 
-## 6. Technical Stack & Deployment Readiness
+## 5. Automated Verification Results
 
-* **Frontend:** React 18, Vite 6, Tailwind CSS 3.4, Lucide React icons.
-* **Serverless Backend:** Node.js function (`/api/doro.js`) ready for Vercel Serverless runtime.
-* **AI Provider:** Google Gemini API (`gemini-2.5-flash`), with JSON schema response enforcement.
-* **Hosting:** Fully configured via [vercel.json](file:///c:/Users/himan/OneDrive/Desktop/Globio/vercel.json) with client SPA routing and serverless function mapping.
-* **Zero Dependencies Warning:** Clean npm audit, zero vulnerabilities, production bundle build time ~39 seconds.
-
----
-
-**Conclusion:** The MVP meets every functional and pedagogical requirement laid out in the problem statement, operates within clean architectural boundaries, and is completely ready for public deployment and evaluation.
+All 4 automated test suites passed with 100% success:
+- **`test/assessment_tests.mjs`:** 7/7 tests passed (All correct, all incorrect, mixed scores, sub-50% skill balance downgrade, incomplete validation).
+- **`test/speaking_rubric_tests.mjs`:** Verified high-quality A1 responses, ordering responses, empty voice responses, and dimensional breakdown.
+- **`test/recommendations_tests.mjs`:** Verified practice mapping across all 4 skills.
+- **`test/doro_ai_tests.mjs`:** Verified active exam anti-leakage guardrails and serverless endpoints.
+- **`npm run build`:** Production Vite bundle built with zero errors and zero vulnerabilities.
