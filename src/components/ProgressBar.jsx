@@ -1,6 +1,7 @@
 import React from 'react';
 import { useAssessment } from '../context/AssessmentContext';
 import { ALL_ASSESSMENT_TASKS } from '../services/assessmentService.js';
+import { stopSpeaking } from '../services/speechRecognitionService.js';
 import { BookOpen, Layers, Compass, Mic } from 'lucide-react';
 
 export default function ProgressBar() {
@@ -82,7 +83,10 @@ export default function ProgressBar() {
           return (
             <button
               key={task.id}
-              onClick={() => goToQuestion(idx)}
+              onClick={() => {
+                stopSpeaking();
+                goToQuestion(idx);
+              }}
               className={`h-8 sm:h-9 rounded-lg font-bold text-xs flex items-center justify-center transition-all ${
                 isCurrent
                   ? 'bg-sky-600 text-white ring-2 ring-sky-500 ring-offset-2 shadow-sm'

@@ -7,7 +7,6 @@ import {
   Edit3,
   Check,
   AlertCircle,
-  Sparkles,
 } from 'lucide-react';
 import {
   isSpeechRecognitionSupported,
@@ -15,6 +14,7 @@ import {
 } from '../services/speechRecognitionService.js';
 
 export default function VoiceRecorder({
+  questionId,
   transcript = '',
   onTranscriptChange,
   isEvaluating = false,
@@ -25,8 +25,28 @@ export default function VoiceRecorder({
   const [errorMsg, setErrorMsg] = useState('');
   const recognitionRef = useRef(null);
   const timerRef = useRef(null);
+  const isMountedRef = useRef(true);
 
   const supported = isSpeechRecognitionSupported();
+
+  // Clean up any active recording session when question changes or component unmounts
+  useEffect(() => {
+    isMountedRef.current = true;
+    return () => {
+      isMountedRef.current = false;
+      if (recognitionRef.current) {
+        try {
+          recognitionRef.current.abort();
+        } catch (e) {
+          // ignore abort error
+        }
+        recognitionRef.current = null;
+      }
+      if (timerRef.current) {
+        clearInterval(timerRef.current);
+      }
+    };
+  }, [questionId]);
 
   useEffect(() => {
     if (isRecording) {
@@ -34,10 +54,16 @@ export default function VoiceRecorder({
         setSeconds((prev) => prev + 1);
       }, 1000);
     } else {
-      clearInterval(timerRef.current);
+      if (timerRef.current) {
+        clearInterval(timerRef.current);
+      }
       setSeconds(0);
     }
-    return () => clearInterval(timerRef.current);
+    return () => {
+      if (timerRef.current) {
+        clearInterval(timerRef.current);
+      }
+    };
   }, [isRecording]);
 
   const startRecording = () => {
@@ -48,16 +74,25 @@ export default function VoiceRecorder({
       return;
     }
 
+    // Stop any existing instance first
+    if (recognitionRef.current) {
+      try {
+        recognitionRef.current.abort();
+      } catch (e) {}
+      recognitionRef.current = null;
+    }
+
     try {
       const rec = startSpeechRecognition({
         lang: 'de-DE',
         onResult: ({ fullTranscript }) => {
-          if (onTranscriptChange) {
+          if (isMountedRef.current && onTranscriptChange) {
             onTranscriptChange(fullTranscript);
           }
         },
         onError: (err) => {
           console.warn("Recognition error:", err);
+          if (!isMountedRef.current) return;
           if (err.error === 'not-allowed') {
             setErrorMsg("Microphone access was denied. Please allow microphone permission in your browser or type your response.");
             setManualMode(true);
@@ -67,7 +102,9 @@ export default function VoiceRecorder({
           stopRecording();
         },
         onEnd: () => {
-          setIsRecording(false);
+          if (isMountedRef.current) {
+            setIsRecording(false);
+          }
         },
       });
 
@@ -87,8 +124,11 @@ export default function VoiceRecorder({
       } catch (e) {
         // Ignore stop on stopped
       }
+      recognitionRef.current = null;
     }
-    setIsRecording(false);
+    if (isMountedRef.current) {
+      setIsRecording(false);
+    }
   };
 
   const clearTranscript = () => {
@@ -109,6 +149,7 @@ export default function VoiceRecorder({
         <div className="flex items-center gap-3">
           {isRecording ? (
             <button
+              type="button"
               onClick={stopRecording}
               className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-rose-600 hover:bg-rose-700 text-white font-bold text-sm shadow-md shadow-rose-600/25 transition animate-pulse"
             >
@@ -117,6 +158,7 @@ export default function VoiceRecorder({
             </button>
           ) : (
             <button
+              type="button"
               onClick={startRecording}
               disabled={isEvaluating}
               className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-sky-600 hover:bg-sky-700 disabled:bg-slate-300 text-white font-bold text-sm shadow-md shadow-sky-600/20 transition"
@@ -128,6 +170,7 @@ export default function VoiceRecorder({
 
           {transcript && !isRecording && (
             <button
+              type="button"
               onClick={clearTranscript}
               disabled={isEvaluating}
               className="p-2 text-slate-400 hover:text-slate-700 hover:bg-slate-200/60 rounded-lg transition"
@@ -139,6 +182,7 @@ export default function VoiceRecorder({
         </div>
 
         <button
+          type="button"
           onClick={() => setManualMode(!manualMode)}
           className="text-xs font-semibold text-slate-500 hover:text-slate-800 inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-slate-200 bg-white hover:bg-slate-50 transition"
         >

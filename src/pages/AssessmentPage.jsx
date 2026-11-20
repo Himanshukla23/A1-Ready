@@ -5,6 +5,7 @@ import ProgressBar from '../components/ProgressBar';
 import QuestionCard from '../components/QuestionCard';
 import SpeakingQuestion from '../components/SpeakingQuestion';
 import { validateCompletion } from '../services/assessmentService.js';
+import { stopSpeaking } from '../services/speechRecognitionService.js';
 import {
   ChevronLeft,
   ChevronRight,
@@ -45,6 +46,16 @@ export default function AssessmentPage() {
     } else {
       nextQuestion();
     }
+  };
+
+  const handlePrev = () => {
+    stopSpeaking();
+    prevQuestion();
+  };
+
+  const handleNext = () => {
+    stopSpeaking();
+    nextQuestion();
   };
 
   const handleAttemptSubmit = () => {
@@ -136,15 +147,15 @@ export default function AssessmentPage() {
 
         {/* Active Task: Speaking Task vs Objective Question */}
         {currentTask.skill === 'speaking' ? (
-          <SpeakingQuestion question={currentTask} />
+          <SpeakingQuestion key={currentTask.id} question={currentTask} />
         ) : (
-          <QuestionCard question={currentTask} />
+          <QuestionCard key={currentTask.id} question={currentTask} />
         )}
 
         {/* Bottom Navigation Toolbar */}
         <div className="mt-6 flex items-center justify-between gap-4">
           <button
-            onClick={prevQuestion}
+            onClick={handlePrev}
             disabled={isFirstTask}
             className={`inline-flex items-center gap-2 px-5 py-3 rounded-xl font-semibold text-sm transition ${
               isFirstTask
@@ -177,7 +188,7 @@ export default function AssessmentPage() {
               </button>
             ) : (
               <button
-                onClick={nextQuestion}
+                onClick={handleNext}
                 className="inline-flex items-center gap-2 px-6 py-3 rounded-xl font-bold text-sm bg-sky-600 hover:bg-sky-700 text-white shadow-md shadow-sky-600/20 transition"
               >
                 <span>Next Task</span>

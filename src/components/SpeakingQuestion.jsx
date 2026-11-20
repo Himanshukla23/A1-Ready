@@ -1,23 +1,27 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useAssessment } from '../context/AssessmentContext';
 import VoiceRecorder from './VoiceRecorder';
-import { speakGermanText } from '../services/speechRecognitionService.js';
+import { speakGermanText, stopSpeaking } from '../services/speechRecognitionService.js';
 import { evaluateSpeakingResponse } from '../services/speakingService.js';
 import {
   Mic,
   Volume2,
   Sparkles,
   CheckCircle2,
-  AlertCircle,
   Loader2,
-  Target,
-  ArrowRight,
 } from 'lucide-react';
 
 export default function SpeakingQuestion({ question }) {
   const { speakingResponses, setSpeakingResponse } = useAssessment();
   const [isPlayingAudio, setIsPlayingAudio] = useState(false);
   const [isEvaluating, setIsEvaluating] = useState(false);
+
+  // Stop any playing prompt audio if user switches questions
+  useEffect(() => {
+    return () => {
+      stopSpeaking();
+    };
+  }, [question?.id]);
 
   if (!question) return null;
 
@@ -34,6 +38,12 @@ export default function SpeakingQuestion({ question }) {
   };
 
   const handleListenPrompt = () => {
+    if (isPlayingAudio) {
+      stopSpeaking();
+      setIsPlayingAudio(false);
+      return;
+    }
+
     setIsPlayingAudio(true);
     speakGermanText(question.promptGerman, {
       onEnd: () => setIsPlayingAudio(false),
@@ -42,7 +52,7 @@ export default function SpeakingQuestion({ question }) {
   };
 
   const handleEvaluateSpeaking = async () => {
-    if (!currentResponse.transcript.trim() || isEvaluating) return;
+    if (!currentResponse.transcript?.trim() || isEvaluating) return;
 
     setIsEvaluating(true);
     try {
@@ -79,8 +89,8 @@ export default function SpeakingQuestion({ question }) {
         </div>
 
         <button
+          type="button"
           onClick={handleListenPrompt}
-          disabled={isPlayingAudio}
           className={`inline-flex items-center gap-1.5 text-xs font-bold px-3 py-1.5 rounded-lg border transition ${
             isPlayingAudio
               ? 'bg-amber-100 text-amber-900 border-amber-300 animate-pulse'
@@ -88,7 +98,7 @@ export default function SpeakingQuestion({ question }) {
           }`}
         >
           <Volume2 className="w-4 h-4 text-amber-600" />
-          <span>{isPlayingAudio ? 'Playing German Audio...' : 'Listen to Prompt'}</span>
+          <span>{isPlayingAudio ? 'Stop German Audio' : 'Listen to Prompt'}</span>
         </button>
       </div>
 
@@ -106,8 +116,10 @@ export default function SpeakingQuestion({ question }) {
         </div>
       </div>
 
-      {/* Voice Recorder Component */}
+      {/* Voice Recorder Component - Isolated per questionId */}
       <VoiceRecorder
+        key={question.id}
+        questionId={question.id}
         transcript={currentResponse.transcript}
         onTranscriptChange={handleTranscriptChange}
         isEvaluating={isEvaluating}
@@ -127,8 +139,9 @@ export default function SpeakingQuestion({ question }) {
         </div>
 
         <button
+          type="button"
           onClick={handleEvaluateSpeaking}
-          disabled={!currentResponse.transcript.trim() || isEvaluating}
+          disabled={!currentResponse.transcript?.trim() || isEvaluating}
           className="inline-flex items-center gap-2 px-6 py-2.5 rounded-xl font-bold text-sm bg-amber-600 hover:bg-amber-700 disabled:bg-slate-300 text-white shadow-sm transition"
         >
           {isEvaluating ? (
